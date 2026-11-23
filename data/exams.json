@@ -1,0 +1,51 @@
+{
+  "is_example": true,
+  "note": "EXAMPLE DATA — replace with structured data from Daft. Do not scrape. events[] matches the exams-board API shape: eventDate, type (EXAM, QUIZ, EVENT, VACATION), title. A bare list of events is also accepted.",
+  "events": [
+    {
+      "eventDate": "2026-11-18",
+      "type": "QUIZ",
+      "title": "גאוגרפיה — אקלים ישראל"
+    },
+    {
+      "eventDate": "2026-11-26",
+      "type": "QUIZ",
+      "title": "אנגלית — Unseen + Vocabulary, Unit 3"
+    },
+    {
+      "eventDate": "2026-11-30",
+      "type": "EXAM",
+      "title": "היסטוריה — מלחמת העולם הראשונה"
+    },
+    {
+      "eventDate": "2026-12-03",
+      "type": "EXAM",
+      "title": "מתמטיקה — משוואות ומערכות משוואות"
+    },
+    {
+      "eventDate": "2026-12-07",
+      "type": "EVENT",
+      "title": "סיור במוזיאון (נרשמים עד יום רביעי)"
+    },
+    {
+      "eventDate": "2026-12-08",
+      "type": "EXAM",
+      "title": "עברית — הבעה בכתב ותחביר"
+    },
+    {
+      "eventDate": "2026-12-14",
+      "type": "EXAM",
+      "title": "מדעים — תא ומערכות בגוף האדם"
+    },
+    {
+      "eventDate": "2026-12-16",
+      "type": "EVENT",
+      "title": "מעבדה במדעים (השלמה למבחן)"
+    },
+    {
+      "eventDate": "2026-12-24",
+      "type": "VACATION",
+      "title": "חופשת חנוכה (תחילה)"
+    }
+  ]
+}

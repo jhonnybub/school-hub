@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F2F2F7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ט׳3">
+  <meta name="description" content="מרכז המידע של כיתה ט׳3 — מערכת שעות, מבחנים ועלון שבועי">
+  <title>מרכז המידע של ט׳3</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F2F2F7;
+      --card: #FFFFFF;
+      --accent: #007AFF;
+      --text: #1C1C1E;
+      --muted: #6C6C70;
+      --hairline: rgba(60, 60, 67, 0.12);
+      --red: #FF3B30;
+      --orange: #FF9500;
+      --urgent-bg: #FFE5E3;
+      --radius: 20px;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 6px 16px rgba(0, 0, 0, 0.06);
+      --tabbar-h: 56px;
+      --font: "Heebo", "Rubik", -apple-system, BlinkMacSystemFont, "SF Hebrew",
+              "Segoe UI", "Arial Hebrew", "Noto Sans Hebrew", sans-serif;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-weight: 500;
+      font-size: 17px;
+      line-height: 1.45;
+      min-height: 100%;
+      direction: rtl;
+      text-align: right;
+    }
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+    }
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 12px 16px 24px;
+      min-height: 100dvh;
+    }
+    header.app-header { margin: 8px 0 16px; }
+    header.app-header .eyebrow {
+      margin: 0 0 2px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    header.app-header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .example-banner {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    h2.section {
+      margin: 22px 0 10px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+    h2.section:first-child { margin-top: 0; }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      margin: 0 0 12px;
+    }
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .muted { color: var(--muted); }
+    .info {
+      background: #E8F1FF;
+      color: #003A8C;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+    .lesson-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .lesson-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .lesson-row:first-of-type { padding-top: 0; }
+    .lesson-time { color: var(--muted); flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+    .lesson-subject { font-weight: 700; flex: 1 1 auto; }
+    .lesson-sub {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .exam {
+      display: block;
+    }
+    .exam.urgent { background: var(--urgent-bg); }
+    .exam-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .exam-meta { color: var(--muted); font-size: 14px; }
+    .exam-title { margin: 0; font-size: 17px; font-weight: 700; }
+    .tag {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+    .tag-red { background: var(--red); }
+    .tag-orange { background: var(--orange); }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+    .badge-EXAM { background: #E8F1FF; color: #007AFF; }
+    .badge-QUIZ { background: #EEE; color: #3A3A3C; }
+    .badge-EVENT { background: #EDE8FF; color: #5856D6; }
+    .badge-VACATION { background: #E6F7EC; color: #248A3D; }
+    details.day {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin: 0 0 10px;
+      overflow: hidden;
+    }
+    details.day summary {
+      list-style: none;
+      cursor: pointer;
+      min-height: 52px;
+      padding: 14px 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    details.day summary::-webkit-details-marker { display: none; }
+    details.day summary .day-title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0 8px;
+      flex: 1 1 auto;
+    }
+    details.day summary .day-name,
+    details.day summary .day-count { unicode-bidi: isolate; }
+    details.day summary .day-count { color: var(--muted); font-weight: 600; }
+    details.day summary::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      margin-top: -3px;
+      flex: 0 0 auto;
+    }
+    details.day[open] summary::after { transform: rotate(-135deg); margin-top: 3px; }
+    .time-ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+    details.day .day-body { padding: 0 16px 14px; }
+    .countdown-soon { color: var(--accent); font-weight: 700; }
+    .countdown-past { color: var(--muted); font-weight: 600; }
+    .countdown-red { color: var(--red); font-weight: 800; }
+    .countdown-orange { color: var(--orange); font-weight: 800; }
+    .newsletter-title { margin: 0 0 4px; font-size: 22px; font-weight: 800; }
+    .newsletter-body { white-space: pre-wrap; margin: 8px 0 0; }
+    .install-hint {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .tabbar {
+      position: fixed;
+      right: 0; left: 0; bottom: 0;
+      height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
+      background: rgba(255, 255, 255, 0.92);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      backdrop-filter: saturate(180%) blur(20px);
+      border-top: 0.5px solid var(--hairline);
+      display: flex;
+      justify-content: center;
+      z-index: 20;
+    }
+    .tabbar-inner {
+      width: 100%;
+      max-width: 430px;
+      display: flex;
+    }
+    .tab {
+      flex: 1 1 0;
+      appearance: none;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      min-height: var(--tabbar-h);
+      cursor: pointer;
+    }
+    .tab svg { width: 26px; height: 26px; }
+    .tab[aria-selected="true"] { color: var(--accent); font-weight: 700; }
+    .empty { color: var(--muted); padding: 8px 0; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <p class="eyebrow" id="today-label"></p>
+      <h1>מרכז המידע של ט׳3</h1>
+    </header>
+    <p class="example-banner" id="example-banner" hidden>מוצגים נתוני דוגמה — יוחלפו כש-Daft יעביר את המידע האמיתי.</p>
+
+    <main>
+      <section class="screen active" id="screen-home" data-screen="home"></section>
+      <section class="screen" id="screen-schedule" data-screen="schedule"></section>
+      <section class="screen" id="screen-exams" data-screen="exams"></section>
+      <section class="screen" id="screen-newsletter" data-screen="newsletter"></section>
+    </main>
+  </div>
+
+  <nav class="tabbar" role="tablist" aria-label="מסכים">
+    <div class="tabbar-inner">
+      <button class="tab" role="tab" aria-selected="true" data-target="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg>
+        ראשי
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-target="schedule">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3.5v3M16 3.5v3M3.5 10h17"/></svg>
+        מערכת
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-target="exams">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8.5A2.5 2.5 0 0 1 19 6.5V20l-3-1.5L13 20l-3-1.5L7 20V6.5A2.5 2.5 0 0 1 9.5 4H8z"/><path d="M10 9h5M10 13h5"/></svg>
+        מבחנים
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-target="newsletter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v14.5A2.5 2.5 0 0 1 17.5 21H6.5A2.5 2.5 0 0 1 4 18.5V6.5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        עלון
+      </button>
+    </div>
+  </nav>
+
+  <script>
+  // ---------------------------------------------------------------------------
+  // TODO: Daft data plugs in here
+  // Embedded example data (Daft schemas). When Daft provides real files, drop
+  // them in data/schedule.json, data/exams.json and data/newsletter.json.
+  // loadData() tries those files first via fetch, then falls back to this block.
+  // Do not scrape or fetch remote school sources from this app.
+  //
+  // schedule: {date, class, lessons:[{num, start, end, subject, teacher, room}]}
+  //   or a list of those days, or {is_example, class, days:[...]}.
+  // exams: [{eventDate, type: EXAM|QUIZ|EVENT|VACATION, title}]
+  //   or {is_example, events:[...]}.
+  // newsletter: {title, date, intro, sections:[{heading, body}]}.
+  // ---------------------------------------------------------------------------
+  const EMBEDDED_DATA = {
+  "schedule": {
+    "is_example": true,
+    "note": "EXAMPLE DATA — replace with structured data from Daft. Do not scrape. Each item in days follows Daft's schedule.json day shape: {date, class, lessons:[{num, start, end, subject, teacher, room}]}. A single day object or a bare list of days is also accepted.",
+    "class": "ט'3",
+    "days": [
+      {
+        "date": "2026-11-22",
+        "class": "ט'3",
+        "lessons": [
+          {
+            "num": 1,
+            "start": "08:00",
+            "end": "08:45",
+            "subject": "מתמטיקה",
+            "teacher": "רותם כהן",
+            "room": "12"
+          },
+          {
+            "num": 2,
+            "start": "08:50",
+            "end": "09:35",
+            "subject": "עברית",
+            "teacher": "נועה לוי",
+            "room": "12"
+          },
+          {
+            "num": 3,
+            "start": "09:50",
+            "end": "10:35",
+            "subject": "אנגלית",
+            "teacher": "Maya Green",
+            "room": "8"
+          },
+          {
+            "num": 4,
+            "start": "10:40",
+            "end": "11:25",
+            "subject": "היסטוריה",
+            "teacher": "יוסי מזרחי",
+            "room": "12"
+          },
+          {
+            "num": 5,
+            "start": "11:40",
+            "end": "12:25",
+            "subject": "מדעים",
+            "teacher": "דנה שפירא",
+            "room": "מעבדה"
+          },
+          {
+            "num": 6,
+            "start": "12:30",
+            "end": "13:15",
+            "subject": "תנ״ך",
+            "teacher": "אביגיל ברק",
+            "room": "12"
+          },
+          {
+            "num": 7,
+            "start": "13:20",
+            "end": "14:05",
+            "subject": "חינוך גופני",
+            "teacher": "עידן פז",
+            "room": "אולם"
+          }
+        ]
+      },
+      {
+        "date": "2026-11-23",
+        "class": "ט'3",
+        "lessons": [
+          {
+            "num": 1,
+            "start": "08:00",
+            "end": "08:45",
+            "subject": "אנגלית",
+            "teacher": "Maya Green",
+            "room": "8"
+          },
+          {
+            "num": 2,
+            "start": "08:50",
+            "end": "09:35",
+            "subject": "מתמטיקה",
+            "teacher": "רותם כהן",
+            "room": "12"
+          },
+          {
+            "num": 3,
+            "start": "09:50",
+            "end": "10:35",
+            "subject": "ספרות",
+            "teacher": "נועה לוי",
+            "room": "12"
+          },
+          {
+            "num": 4,
+            "start": "10:40",
+            "end": "11:25",
+            "subject": "אזרחות",
+            "teacher": "יוסי מזרחי",
+            "room": "12"
+          },
+          {
+            "num": 5,
+            "start": "11:40",
+            "end": "12:25",
+            "subject": "גאוגרפיה",
+            "teacher": "תמר אביב",
+            "room": "15"
+          },
+          {
+            "num": 6,
+            "start": "12:30",
+            "end": "13:15",
+            "subject": "חינוך",
+            "teacher": "רותם כהן",
+            "room": "12"
+          },
+          {
+            "num": 7,
+            "start": "13:20",
+            "end": "14:05",
+            "subject": "אומנות",
+            "teacher": "ליאור חדד",
+            "room": "סטודיו"
+          }
+        ]
+      },
+      {
+        "date": "2026-11-24",
+        "class": "ט'3",
+        "lessons": [
+          {
+            "num": 1,
+            "start": "08:00",
+            "end": "08:45",
+            "subject": "מדעים",
+            "teacher": "דנה שפירא",
+            "room": "מעבדה"
+          },
+          {
+            "num": 2,
+            "start": "08:50",
+            "end": "09:35",
+            "subject": "מדעים",
+            "teacher": "דנה שפירא",
+            "room": "מעבדה"
+          },
+          {
+            "num": 3,
+            "start": "09:50",
+            "end": "10:35",
+            "subject": "מתמטיקה",
+            "teacher": "רותם כהן",
+            "room": "12"
+          },
+          {
+            "num": 4,
+            "start": "10:40",
+            "end": "11:25",
+            "subject": "עברית",
+            "teacher": "נועה לוי",
+            "room": "12"
+          },
+          {
+            "num": 5,
+            "start": "11:40",
+            "end": "12:25",
+            "subject": "היסטוריה",
+            "teacher": "יוסי מזרחי",
+            "room": "12"
+          },
+          {
+            "num": 6,
+            "start": "12:30",
+            "end": "13:15",
+            "subject": "אנגלית",
+            "teacher": "Maya Green",
+            "room": "8"
+          }
+        ]
+      },
+      {
+        "date": "2026-11-25",
+        "class": "ט'3",
+        "lessons": [
+          {
+            "num": 1,
+            "start": "08:00",
+            "end": "08:45",
+            "subject": "תנ״ך",
+            "teacher": "אביגיל ברק",
+            "room": "12"
+          },
+          {
+            "num": 2,
+            "start": "08:50",
+            "end": "09:35",
+            "subject": "מתמטיקה",
+            "teacher": "רותם כהן",
+            "room": "12"
+          },
+          {
+            "num": 3,
+            "start": "09:50",
+            "end": "10:35",
+            "subject": "אנגלית",
+            "teacher": "Maya Green",
+            "room": "8"
+          },
+          {
+            "num": 4,
+            "start": "10:40",
+            "end": "11:25",
+            "subject": "ספרות",
+            "teacher": "נועה לוי",
+            "room": "12"
+          },
+          {
+            "num": 5,
+            "start": "11:40",
+            "end": "12:25",
+            "subject": "חינוך גופני",
+            "teacher": "עידן פז",
+            "room": "אולם"
+          },
+          {
+            "num": 6,
+            "start": "12:30",
+            "end": "13:15",
+            "subject": "מחשבים",
+            "teacher": "שירה נחום",
+            "room": "מחשבים"
+          },
+          {
+            "num": 7,
+            "start": "13:20",
+            "end": "14:05",
+            "subject": "מחשבים",
+            "teacher": "שירה נחום",
+            "room": "מחשבים"
+          }
+        ]
+      },
+      {
+        "date": "2026-11-26",
+        "class": "ט'3",
+        "lessons": [
+          {
+            "num": 1,
+            "start": "08:00",
+            "end": "08:45",
+            "subject": "עברית",
+            "teacher": "נועה לוי",
+            "room": "12"
+          },
+          {
+            "num": 2,
+            "start": "08:50",
+            "end": "09:35",
+            "subject": "היסטוריה",
+            "teacher": "יוסי מזרחי",
+            "room": "12"
+          },
+          {
+            "num": 3,
+            "start": "09:50",
+            "end": "10:35",
+            "subject": "מתמטיקה",
+            "teacher": "רותם כהן",
+            "room": "12"
+          },
+          {
+            "num": 4,
+            "start": "10:40",
+            "end": "11:25",
+            "subject": "אזרחות",
+            "teacher": "יוסי מזרחי",
+            "room": "12"
+          },
+          {
+            "num": 5,
+            "start": "11:40",
+            "end": "12:25",
+            "subject": "מוזיקה",
+            "teacher": "אלון דהן",
+            "room": "חדר מוזיקה"
+          },
+          {
+            "num": 6,
+            "start": "12:30",
+            "end": "13:15",
+            "subject": "אנגלית",
+            "teacher": "Maya Green",
+            "room": "8"
+          }
+        ]
+      },
+      {
+        "date": "2026-11-27",
+        "class": "ט'3",
+        "lessons": [
+          {
+            "num": 1,
+            "start": "08:00",
+            "end": "08:45",
+            "subject": "חינוך",
+            "teacher": "רותם כהן",
+            "room": "12"
+          },
+          {
+            "num": 2,
+            "start": "08:50",
+            "end": "09:35",
+            "subject": "תנ״ך",
+            "teacher": "אביגיל ברק",
+            "room": "12"
+          },
+          {
+            "num": 3,
+            "start": "09:50",
+            "end": "10:35",
+            "subject": "מתמטיקה",
+            "teacher": "רותם כהן",
+            "room": "12"
+          },
+          {
+            "num": 4,
+            "start": "10:40",
+            "end": "11:15",
+            "subject": "שיעור שבועי / שיחה",
+            "teacher": "רותם כהן",
+            "room": "12"
+          }
+        ]
+      }
+    ]
+  },
+  "exams": {
+    "is_example": true,
+    "note": "EXAMPLE DATA — replace with structured data from Daft. Do not scrape. events[] matches the exams-board API shape: eventDate, type (EXAM, QUIZ, EVENT, VACATION), title. A bare list of events is also accepted.",
+    "events": [
+      {
+        "eventDate": "2026-11-18",
+        "type": "QUIZ",
+        "title": "גאוגרפיה — אקלים ישראל"
+      },
+      {
+        "eventDate": "2026-11-26",
+        "type": "QUIZ",
+        "title": "אנגלית — Unseen + Vocabulary, Unit 3"
+      },
+      {
+        "eventDate": "2026-11-30",
+        "type": "EXAM",
+        "title": "היסטוריה — מלחמת העולם הראשונה"
+      },
+      {
+        "eventDate": "2026-12-03",
+        "type": "EXAM",
+        "title": "מתמטיקה — משוואות ומערכות משוואות"
+      },
+      {
+        "eventDate": "2026-12-07",
+        "type": "EVENT",
+        "title": "סיור במוזיאון (נרשמים עד יום רביעי)"
+      },
+      {
+        "eventDate": "2026-12-08",
+        "type": "EXAM",
+        "title": "עברית — הבעה בכתב ותחביר"
+      },
+      {
+        "eventDate": "2026-12-14",
+        "type": "EXAM",
+        "title": "מדעים — תא ומערכות בגוף האדם"
+      },
+      {
+        "eventDate": "2026-12-16",
+        "type": "EVENT",
+        "title": "מעבדה במדעים (השלמה למבחן)"
+      },
+      {
+        "eventDate": "2026-12-24",
+        "type": "VACATION",
+        "title": "חופשת חנוכה (תחילה)"
+      }
+    ]
+  },
+  "newsletter": {
+    "is_example": true,
+    "note": "EXAMPLE DATA — replace this file with structured data from Daft. Do not scrape.",
+    "title": "העלון השבועי של ט׳3",
+    "date": "2026-11-23",
+    "intro": "שבוע טוב לכולם! זהו עלון לדוגמה בלבד. כש-Daft יעביר את העלון האמיתי, הוא יופיע כאן במקומו.",
+    "sections": [
+      {
+        "heading": "הודעות חשובות",
+        "body": "ביום רביעי השיעורים האחרונים (מחשבים) יתקיימו בחדר 3 במקום בחדר המחשבים, בגלל תחזוקה.\n\nביום שישי הלימודים מסתיימים בשעה 11:15. נא להגיע עם ציוד ספורט ביום ראשון הבא."
+      },
+      {
+        "heading": "מבחנים קרובים",
+        "body": "יום חמישי 26.11 — בוחן באנגלית (Unseen + אוצר מילים).\nיום שני 30.11 — מבחן בהיסטוריה על מלחמת העולם הראשונה.\nיום חמישי 3.12 — מבחן במתמטיקה (משוואות)."
+      },
+      {
+        "heading": "פעילויות וטיולים",
+        "body": "נרשמים לסיור במוזיאון עד יום רביעי בבוקר אצל המחנכת. מי שטרם החזיר טופס חתום — נא להביא השבוע."
+      },
+      {
+        "heading": "מהמחנכת",
+        "body": "כל הכבוד על האווירה בכיתה בשבוע שעבר. ממשיכים כך, ומי שצריך עזרה לקראת המבחנים מוזמן לגשת אליי בהפסקה הגדולה."
+      }
+    ]
+  }
+};
+
+  const TZ = "Asia/Jerusalem";
+  const WEEKDAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+  const TYPE_LABELS = { EXAM: "מבחן", QUIZ: "בוחן", EVENT: "אירוע", VACATION: "חופשה" };
+  const EXAM_TYPES = new Set(["EXAM", "QUIZ"]);
+  const SCREENS = ["home", "schedule", "exams", "newsletter"];
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function todayIsrael() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit",
+    }).format(new Date());
+    return parts; // YYYY-MM-DD
+  }
+
+  function parseISODate(value) {
+    if (!value || typeof value !== "string") return null;
+    const m = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return null;
+    return { iso: `${m[1]}-${m[2]}-${m[3]}`, y: +m[1], mo: +m[2], d: +m[3] };
+  }
+
+  function addDays(iso, n) {
+    const [y, mo, d] = iso.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, mo - 1, d + n));
+    const yy = dt.getUTCFullYear();
+    const mm = String(dt.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(dt.getUTCDate()).padStart(2, "0");
+    return `${yy}-${mm}-${dd}`;
+  }
+
+  function weekdayName(iso) {
+    const [y, mo, d] = iso.split("-").map(Number);
+    // JS: 0=Sun ... matches WEEKDAYS
+    return WEEKDAYS[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
+  }
+
+  function formatDate(iso) {
+    const p = parseISODate(iso);
+    if (!p) return "";
+    return `${p.d}.${p.mo}.${p.y}`;
+  }
+
+  function formatDayHeading(iso) {
+    return `יום ${weekdayName(iso)}, ${formatDate(iso)}`;
+  }
+
+  function daysUntil(iso, today) {
+    const a = parseISODate(iso), b = parseISODate(today);
+    if (!a || !b) return 0;
+    return Math.round(Date.UTC(a.y, a.mo - 1, a.d) - Date.UTC(b.y, b.mo - 1, b.d)) / 86400000;
+  }
+
+  function daysUntilLabel(iso, today) {
+    const delta = daysUntil(iso, today);
+    if (delta === 0) return [delta, "היום"];
+    if (delta === 1) return [delta, "מחר"];
+    if (delta === -1) return [delta, "אתמול"];
+    if (delta > 1) return [delta, `בעוד ${delta} ימים`];
+    return [delta, `לפני ${Math.abs(delta)} ימים`];
+  }
+
+  function urgencyKind(iso, today, type) {
+    if (!iso || !EXAM_TYPES.has(type)) return null;
+    const delta = daysUntil(iso, today);
+    if (delta >= 0 && delta <= 1) return "red";
+    if (delta === 2) return "orange";
+    return null;
+  }
+
+  function normalizeSchedule(raw) {
+    if (!raw) return null;
+    if (Array.isArray(raw)) {
+      return { is_example: false, class: raw[0] && raw[0].class, days: raw };
+    }
+    if (Array.isArray(raw.days)) {
+      return { is_example: !!raw.is_example, class: raw.class || raw.class_name, days: raw.days };
+    }
+    if (raw.lessons || raw.date) {
+      return { is_example: !!raw.is_example, class: raw.class || raw.class_name, days: [raw] };
+    }
+    return null;
+  }
+
+  function normalizeExams(raw) {
+    if (!raw) return null;
+    if (Array.isArray(raw)) return { is_example: false, events: raw };
+    const events = raw.events || raw.exams;
+    if (!Array.isArray(events)) return null;
+    return { is_example: !!raw.is_example, events };
+  }
+
+  function normalizeNewsletter(raw) {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+    if (!raw.title && !raw.intro && !raw.sections) return null;
+    return raw;
+  }
+
+  async function loadFromFiles() {
+    const [s, e, n] = await Promise.all([
+      fetch("data/schedule.json"),
+      fetch("data/exams.json"),
+      fetch("data/newsletter.json"),
+    ]);
+    if (!s.ok || !e.ok || !n.ok) throw new Error("data files unavailable");
+    return {
+      schedule: await s.json(),
+      exams: await e.json(),
+      newsletter: await n.json(),
+    };
+  }
+
+  async function loadData() {
+    // Try local data/*.json first (Daft drop-in). Fall back to embedded examples.
+    try {
+      return await loadFromFiles();
+    } catch {
+      return EMBEDDED_DATA;
+    }
+  }
+
+  function lessonTime(lesson) {
+    const start = (lesson.start || "").trim();
+    const end = (lesson.end || "").trim();
+    if (start && end) return `${start}–${end}`;
+    return start || end || (lesson.time || "");
+  }
+
+  function pickHomeDay(schedule, today) {
+    const tomorrow = addDays(today, 1);
+    const days = (schedule && schedule.days || [])
+      .map((day) => ({ date: (parseISODate(day.date) || {}).iso, day }))
+      .filter((x) => x.date && (x.day.lessons || []).length)
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const exact = days.find((x) => x.date === tomorrow);
+    if (exact) return { date: exact.date, day: exact.day, isTomorrow: true };
+    const next = days.find((x) => x.date > today);
+    if (next) return { date: next.date, day: next.day, isTomorrow: false };
+    return null;
+  }
+
+  function upcomingExams(exams, today, limit = 5) {
+    return (exams && exams.events || [])
+      .filter((item) => EXAM_TYPES.has((item.type || "").toUpperCase()))
+      .map((item) => ({ date: (parseISODate(item.eventDate || item.date) || {}).iso, item }))
+      .filter((x) => x.date && x.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, limit);
+  }
+
+  function examCard(item, dateIso, today) {
+    const type = (item.type || "").toUpperCase();
+    const typeLabel = TYPE_LABELS[type] || type || "אירוע";
+    const title = item.title || item.subject || typeLabel;
+    const kind = urgencyKind(dateIso, today, type);
+    const [delta, label] = dateIso ? daysUntilLabel(dateIso, today) : [null, ""];
+    const tag = kind ? `<span class="tag tag-${kind}">${escapeHtml(label)}</span>` : "";
+    let countdown = "";
+    if (dateIso && !kind) {
+      const cls = delta < 0 ? "countdown-past" : "countdown-soon";
+      countdown = ` · <span class="${cls}">${escapeHtml(label)}</span>`;
+    }
+    const meta = [
+      `<span class="badge badge-${escapeHtml(type)}">${escapeHtml(typeLabel)}</span>`,
+      dateIso ? formatDate(dateIso) : "",
+      item.time || "",
+    ].filter(Boolean).join(" · ");
+    return `<article class="card exam${kind ? " urgent" : ""}">
+      <div class="exam-top">
+        <div class="exam-meta">${meta}${countdown}</div>
+        ${tag}
+      </div>
+      <p class="exam-title">${escapeHtml(title)}</p>
+    </article>`;
+  }
+
+  function renderHome(root, schedule, exams, today) {
+    const parts = [];
+    const picked = pickHomeDay(schedule, today);
+    const tomorrow = addDays(today, 1);
+    if (picked && picked.isTomorrow) {
+      parts.push(`<h2 class="section">מערכת של מחר</h2>`);
+    } else {
+      parts.push(`<h2 class="section">המערכת הבאה</h2>`);
+    }
+    if (picked) {
+      if (!picked.isTomorrow) {
+        parts.push(`<p class="info">אין לימודים מחר (${escapeHtml(formatDayHeading(tomorrow))}). מוצגת המערכת של ${escapeHtml(formatDayHeading(picked.date))}.</p>`);
+      }
+      const className = picked.day.class || (schedule && schedule.class) || "ט'3";
+      const rows = (picked.day.lessons || []).map((lesson) => {
+        const time = escapeHtml(lessonTime(lesson));
+        const subject = escapeHtml(lesson.subject || "שיעור");
+        return `<div class="lesson-row"><span class="lesson-subject">${subject}</span><span class="lesson-time time-ltr">${time}</span></div>`;
+      }).join("");
+      parts.push(`<div class="card"><p class="kicker">${escapeHtml(formatDayHeading(picked.date))} · כיתה ${escapeHtml(className)}</p>${rows}</div>`);
+    } else if (schedule) {
+      parts.push(`<p class="info">אין מערכת לימודים בהמשך, לפי הנתונים שיש כרגע.</p>`);
+    } else {
+      parts.push(`<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`);
+    }
+
+    parts.push(`<h2 class="section">מבחנים קרובים</h2>`);
+    const soon = upcomingExams(exams, today);
+    if (soon.length) {
+      parts.push(soon.map((x) => examCard(x.item, x.date, today)).join(""));
+    } else if (exams) {
+      parts.push(`<p class="info">אין מבחנים קרובים ברשימה.</p>`);
+    } else {
+      parts.push(`<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`);
+    }
+    parts.push(`<p class="install-hint">כדי לשמור במסך הבית באייפון: פתחו ב-Safari ← לחצו על שיתוף ← הוספה למסך הבית. האפליקציה תיפתח בלי שורת כתובת, בלי שה-Mac יהיה דלוק.</p>`);
+    root.innerHTML = parts.join("");
+  }
+
+  function renderSchedule(root, schedule, today) {
+    if (!schedule || !(schedule.days || []).length) {
+      root.innerHTML = `<h2 class="section">מערכת שעות</h2><p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
+      return;
+    }
+    const className = schedule.class || "ט'3";
+    const days = (schedule.days || []).slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    const blocks = days.map((day) => {
+      const iso = (parseISODate(day.date) || {}).iso;
+      const isToday = iso === today;
+      const lessons = day.lessons || [];
+      const rows = lessons.length ? lessons.map((lesson) => {
+        const time = lessonTime(lesson);
+        const num = lesson.num ?? lesson.period;
+        const timeHtml = time ? `<span class="time-ltr">${escapeHtml(time)}</span>` : "";
+        const numHtml = (num != null && num !== "") ? ` · שיעור ${escapeHtml(num)}` : "";
+        const footer = [lesson.teacher, lesson.room ? `חדר ${lesson.room}` : ""].filter(Boolean).join(" · ");
+        return `<div class="lesson-row">
+          <div>
+            <div class="lesson-subject">${escapeHtml(lesson.subject || "שיעור")}</div>
+            ${footer ? `<div class="lesson-sub">${escapeHtml(footer)}</div>` : ""}
+          </div>
+          <span class="lesson-time">${timeHtml}${numHtml}</span>
+        </div>`;
+      }).join("") : `<p class="empty">אין שיעורים ביום זה.</p>`;
+      const titleHtml = iso
+        ? `<span class="day-name">${isToday ? "היום · " : ""}${escapeHtml(formatDayHeading(iso))}</span>`
+        : `<span class="day-name">${escapeHtml(day.day || "יום לימודים")}</span>`;
+      const countHtml = lessons.length ? `<span class="day-count">${lessons.length} שיעורים</span>` : "";
+      return `<details class="day"${isToday ? " open" : ""}>
+        <summary><span class="day-title">${titleHtml}${countHtml}</span></summary>
+        <div class="day-body">${rows}</div>
+      </details>`;
+    }).join("");
+    const shabbat = weekdayName(today) === "שבת"
+      ? `<p class="info">היום שבת — אין לימודים. אפשר לפתוח כל יום במערכת.</p>`
+      : "";
+    root.innerHTML = `<h2 class="section">מערכת שעות</h2><p class="kicker">כיתה ${escapeHtml(className)}</p>${shabbat}${blocks}`;
+  }
+
+  function renderExams(root, exams, today) {
+    if (!exams || !(exams.events || []).length) {
+      root.innerHTML = `<h2 class="section">מבחנים ואירועים</h2><p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
+      return;
+    }
+    const dated = [];
+    const undated = [];
+    for (const item of exams.events) {
+      const iso = (parseISODate(item.eventDate || item.date) || {}).iso;
+      if (iso) dated.push({ date: iso, item });
+      else undated.push(item);
+    }
+    dated.sort((a, b) => a.date.localeCompare(b.date) || String(a.item.type).localeCompare(String(b.item.type)));
+    const upcoming = dated.filter((x) => x.date >= today);
+    const past = dated.filter((x) => x.date < today).reverse();
+    const parts = [`<h2 class="section">מבחנים ואירועים</h2>`];
+    if (upcoming.length) {
+      parts.push(`<p class="kicker">קרובים · ${upcoming.length}</p>`);
+      parts.push(upcoming.map((x) => examCard(x.item, x.date, today)).join(""));
+    } else {
+      parts.push(`<p class="info">אין מבחנים או אירועים קרובים ברשימה.</p>`);
+    }
+    if (undated.length) {
+      parts.push(`<p class="kicker">ללא תאריך</p>`);
+      parts.push(undated.map((item) => examCard(item, null, today)).join(""));
+    }
+    if (past.length) {
+      parts.push(`<details class="day"><summary>אירועים שעברו · ${past.length}</summary><div class="day-body">`);
+      parts.push(past.map((x) => examCard(x.item, x.date, today)).join(""));
+      parts.push(`</div></details>`);
+    }
+    root.innerHTML = parts.join("");
+  }
+
+  function renderNewsletter(root, newsletter) {
+    if (!newsletter) {
+      root.innerHTML = `<h2 class="section">עלון שבועי</h2><p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
+      return;
+    }
+    const parts = [`<h2 class="section">עלון שבועי</h2>`];
+    parts.push(`<p class="newsletter-title">${escapeHtml(newsletter.title || "עלון שבועי")}</p>`);
+    if (newsletter.date) {
+      const iso = (parseISODate(newsletter.date) || {}).iso;
+      if (iso) parts.push(`<p class="kicker">${escapeHtml(formatDate(iso))}</p>`);
+    }
+    if (newsletter.intro) {
+      parts.push(`<div class="card"><p class="newsletter-body">${escapeHtml(newsletter.intro)}</p></div>`);
+    }
+    for (const section of newsletter.sections || []) {
+      const heading = (section.heading || "").trim();
+      const body = (section.body || "").trim();
+      parts.push(`<div class="card">${heading ? `<p class="exam-title">${escapeHtml(heading)}</p>` : ""}<p class="newsletter-body">${escapeHtml(body)}</p></div>`);
+    }
+    root.innerHTML = parts.join("");
+  }
+
+  function showScreen(name) {
+    const target = SCREENS.includes(name) ? name : "home";
+    document.querySelectorAll(".screen").forEach((el) => {
+      el.classList.toggle("active", el.dataset.screen === target);
+    });
+    document.querySelectorAll(".tab").forEach((btn) => {
+      btn.setAttribute("aria-selected", btn.dataset.target === target ? "true" : "false");
+    });
+    if (location.hash.replace("#", "") !== target) {
+      history.replaceState(null, "", `#${target}`);
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function boot(raw) {
+    const today = todayIsrael();
+    const schedule = normalizeSchedule(raw.schedule);
+    const exams = normalizeExams(raw.exams);
+    const newsletter = normalizeNewsletter(raw.newsletter);
+    const isExample = !!(schedule && schedule.is_example) || !!(exams && exams.is_example) || !!(newsletter && newsletter.is_example);
+    document.getElementById("today-label").textContent = `היום ${formatDayHeading(today)}`;
+    const banner = document.getElementById("example-banner");
+    banner.hidden = !isExample;
+    renderHome(document.getElementById("screen-home"), schedule, exams, today);
+    renderSchedule(document.getElementById("screen-schedule"), schedule, today);
+    renderExams(document.getElementById("screen-exams"), exams, today);
+    renderNewsletter(document.getElementById("screen-newsletter"), newsletter);
+
+    document.querySelectorAll(".tab").forEach((btn) => {
+      btn.addEventListener("click", () => showScreen(btn.dataset.target));
+    });
+    window.addEventListener("hashchange", () => showScreen(location.hash.replace("#", "")));
+    const initial = location.hash.replace("#", "") || "home";
+    showScreen(initial);
+  }
+
+  loadData().then(boot);
+  </script>
+</body>
+</html>
