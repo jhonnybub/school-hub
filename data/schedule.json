@@ -49,5 +49,65 @@
         "status": null
       }
     ]
+  },
+  {
+    "date": "2026-11-25",
+    "class": "ט׳3",
+    "lessons": [
+      {
+        "num": 1,
+        "start": null,
+        "end": null,
+        "subject": "פיזיולוגיה של המאמץ/ספרדית",
+        "teacher": "בתיה/אינה",
+        "room": null,
+        "status": null
+      },
+      {
+        "num": 2,
+        "start": null,
+        "end": null,
+        "subject": "תנך",
+        "teacher": "ורד",
+        "room": "ט׳3",
+        "status": null
+      },
+      {
+        "num": 3,
+        "start": null,
+        "end": null,
+        "subject": "מתמטיקה 5 יח'/מתמטיקה 4 יח'",
+        "teacher": "קרן/חגית",
+        "room": null,
+        "status": null
+      },
+      {
+        "num": 4,
+        "start": null,
+        "end": null,
+        "subject": "אנגלית א/אנגלית",
+        "teacher": "רונית/אינה",
+        "room": null,
+        "status": null
+      },
+      {
+        "num": 5,
+        "start": null,
+        "end": null,
+        "subject": "מתמטיקה 5 יח'/מתמטיקה 4 יח'",
+        "teacher": "קרן/חגית",
+        "room": null,
+        "status": null
+      },
+      {
+        "num": 6,
+        "start": null,
+        "end": null,
+        "subject": "אנגלית א/אנגלית",
+        "teacher": "רונית/אינה",
+        "room": null,
+        "status": null
+      }
+    ]
   }
 ]
