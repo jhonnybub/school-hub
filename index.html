@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#F2F2F7">
+  <meta name="theme-color" content="#FFFFFF">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -13,255 +13,265 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #F2F2F7;
-      --card: #FFFFFF;
-      --accent: #007AFF;
-      --text: #1C1C1E;
-      --muted: #6C6C70;
-      --hairline: rgba(60, 60, 67, 0.12);
-      --red: #FF3B30;
-      --orange: #FF9500;
-      --urgent-bg: #FFE5E3;
-      --radius: 20px;
-      --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 6px 16px rgba(0, 0, 0, 0.06);
-      --tabbar-h: 56px;
-      --font: "Heebo", "Rubik", -apple-system, BlinkMacSystemFont, "SF Hebrew",
-              "Segoe UI", "Arial Hebrew", "Noto Sans Hebrew", sans-serif;
+    @font-face {
+      font-family: "Assistant";
+      src: url("fonts/Assistant-VariableFont_wght.ttf") format("truetype");
+      font-weight: 100 800;
+      font-style: normal;
+      font-display: block;
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --red: #E10600;
+      --muted: #6B6B6B;
+      --cancelled: #9A9A9A;
+      --line: #EEEEEE;
+      --font: "Assistant", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
     html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--white);
+      color: var(--black);
       font-family: var(--font);
-      font-weight: 500;
+      font-weight: 400;
       font-size: 17px;
-      line-height: 1.45;
+      line-height: 1.25;
       min-height: 100%;
       direction: rtl;
       text-align: right;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
     }
+
     body {
       padding-top: env(safe-area-inset-top);
-      padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
     }
+
     .app {
       max-width: 430px;
       margin: 0 auto;
-      padding: 12px 16px 24px;
+      padding: 16px 24px 40px;
       min-height: 100dvh;
     }
-    header.app-header { margin: 8px 0 16px; }
-    header.app-header .eyebrow {
-      margin: 0 0 2px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 600;
-    }
-    header.app-header h1 {
-      margin: 0;
+
+    header.app-header { margin-bottom: 20px; }
+
+    .greeting {
       font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      line-height: 1.15;
+      color: var(--black);
     }
-    .example-banner {
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 500;
-    }
-    .screen { display: none; }
-    .screen.active { display: block; }
-    h2.section {
-      margin: 22px 0 10px;
-      font-size: 20px;
-      font-weight: 800;
-    }
-    h2.section:first-child { margin-top: 0; }
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px 16px;
-      margin: 0 0 12px;
-    }
-    .kicker {
-      margin: 0 0 8px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .muted { color: var(--muted); }
-    .info {
-      background: #E8F1FF;
-      color: #003A8C;
-      border-radius: 14px;
-      padding: 12px 14px;
-      margin: 0 0 12px;
+
+    .date {
+      margin-top: 6px;
       font-size: 15px;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: -0.1px;
+      line-height: 1.3;
     }
-    .lesson-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 12px;
-      padding: 9px 0;
-      border-bottom: 1px solid var(--hairline);
-    }
-    .lesson-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .lesson-row:first-of-type { padding-top: 0; }
-    .lesson-time { color: var(--muted); flex: 0 0 auto; font-variant-numeric: tabular-nums; }
-    .lesson-subject { font-weight: 700; flex: 1 1 auto; }
-    .lesson-sub {
-      margin: 2px 0 0;
+
+    .example-banner {
+      margin-top: 8px;
       color: var(--muted);
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 400;
+      line-height: 1.3;
     }
-    .exam {
-      display: block;
+
+    .text-nav {
+      display: none;
+      gap: 16px;
+      margin: -8px 0 20px;
+      padding: 0 0 12px;
+      border-bottom: 1px solid var(--line);
     }
-    .exam.urgent { background: var(--urgent-bg); }
-    .exam-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 4px;
-    }
-    .exam-meta { color: var(--muted); font-size: 14px; }
-    .exam-title { margin: 0; font-size: 17px; font-weight: 700; }
-    .tag {
-      display: inline-block;
-      padding: 2px 9px;
-      border-radius: 999px;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.4;
-      white-space: nowrap;
-    }
-    .tag-red { background: var(--red); }
-    .tag-orange { background: var(--orange); }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-left: 6px;
-    }
-    .badge-EXAM { background: #E8F1FF; color: #007AFF; }
-    .badge-QUIZ { background: #EEE; color: #3A3A3C; }
-    .badge-EVENT { background: #EDE8FF; color: #5856D6; }
-    .badge-VACATION { background: #E6F7EC; color: #248A3D; }
-    details.day {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      margin: 0 0 10px;
-      overflow: hidden;
-    }
-    details.day summary {
-      list-style: none;
-      cursor: pointer;
-      min-height: 52px;
-      padding: 14px 16px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    details.day summary::-webkit-details-marker { display: none; }
-    details.day summary .day-title {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 0 8px;
-      flex: 1 1 auto;
-    }
-    details.day summary .day-name,
-    details.day summary .day-count { unicode-bidi: isolate; }
-    details.day summary .day-count { color: var(--muted); font-weight: 600; }
-    details.day summary::after {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-right: 2px solid var(--muted);
-      border-bottom: 2px solid var(--muted);
-      transform: rotate(45deg);
-      margin-top: -3px;
-      flex: 0 0 auto;
-    }
-    details.day[open] summary::after { transform: rotate(-135deg); margin-top: 3px; }
-    .time-ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
-    details.day .day-body { padding: 0 16px 14px; }
-    .countdown-soon { color: var(--accent); font-weight: 700; }
-    .countdown-past { color: var(--muted); font-weight: 600; }
-    .countdown-red { color: var(--red); font-weight: 800; }
-    .countdown-orange { color: var(--orange); font-weight: 800; }
-    .newsletter-title { margin: 0 0 4px; font-size: 22px; font-weight: 800; }
-    .newsletter-body { white-space: pre-wrap; margin: 8px 0 0; }
-    .install-hint {
-      margin-top: 20px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-    .tabbar {
-      position: fixed;
-      right: 0; left: 0; bottom: 0;
-      height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
-      padding-bottom: env(safe-area-inset-bottom);
-      background: rgba(255, 255, 255, 0.92);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      backdrop-filter: saturate(180%) blur(20px);
-      border-top: 0.5px solid var(--hairline);
-      display: flex;
-      justify-content: center;
-      z-index: 20;
-    }
-    .tabbar-inner {
-      width: 100%;
-      max-width: 430px;
-      display: flex;
-    }
-    .tab {
-      flex: 1 1 0;
+    .text-nav.visible { display: flex; }
+    .text-nav button {
       appearance: none;
       border: 0;
       background: none;
-      color: var(--muted);
+      padding: 8px 0;
       font-family: inherit;
-      font-size: 10px;
+      font-size: 13px;
       font-weight: 600;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      min-height: var(--tabbar-h);
+      color: var(--muted);
+      cursor: pointer;
+      line-height: 1.3;
+    }
+    .text-nav button[aria-selected="true"] { color: var(--black); }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .section { margin-top: 0; }
+    .section + .section { margin-top: 24px; }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--black);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    button.section-link {
+      appearance: none;
+      border: 0;
+      background: none;
+      padding: 0;
+      font: inherit;
+      color: inherit;
       cursor: pointer;
     }
-    .tab svg { width: 26px; height: 26px; }
-    .tab[aria-selected="true"] { color: var(--accent); font-weight: 700; }
-    .empty { color: var(--muted); padding: 8px 0; }
+
+    .row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .row:last-child { border-bottom: 0; }
+
+    .row-start { min-width: 0; flex: 1; }
+
+    .row-top {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .subject {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      line-height: 1.25;
+      color: var(--black);
+    }
+
+    .room {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+    .time {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--black);
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+      unicode-bidi: isolate;
+      flex-shrink: 0;
+      line-height: 1.25;
+      letter-spacing: -0.1px;
+    }
+
+    .flag {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--red);
+      line-height: 1.25;
+      flex-shrink: 0;
+    }
+
+    .row.cancelled .subject {
+      color: var(--muted);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+      text-decoration-color: #9A9A9A;
+    }
+    .row.cancelled .room,
+    .row.cancelled .time {
+      color: var(--cancelled);
+    }
+
+    .count {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--muted);
+      flex-shrink: 0;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+    .count.urgent {
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    .empty, .info, .install-hint, .more-link, .intro, .newsletter-body {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .install-hint { margin-top: 24px; }
+    .more-link {
+      display: inline-block;
+      margin-top: 16px;
+      color: var(--black);
+      font-weight: 600;
+      font-size: 13px;
+      text-decoration: none;
+      background: none;
+      border: 0;
+      padding: 0;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .newsletter-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      line-height: 1.25;
+      color: var(--black);
+      margin-bottom: 4px;
+    }
+    .newsletter-date {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .intro {
+      color: var(--black);
+      margin-bottom: 20px;
+    }
+    .newsletter-body {
+      color: var(--black);
+      white-space: pre-wrap;
+      margin: 0;
+    }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="app-header">
-      <p class="eyebrow" id="today-label"></p>
-      <h1>מרכז המידע של ט׳3</h1>
+      <h1 class="greeting" id="greeting"></h1>
+      <p class="date" id="date-line"></p>
+      <p class="example-banner" id="example-banner" hidden>מוצגים נתוני דוגמה — יוחלפו כש-Daft יעביר את המידע האמיתי.</p>
     </header>
-    <p class="example-banner" id="example-banner" hidden>מוצגים נתוני דוגמה — יוחלפו כש-Daft יעביר את המידע האמיתי.</p>
+
+    <nav class="text-nav" id="text-nav" aria-label="מסכים">
+      <button type="button" data-target="home">ראשי</button>
+      <button type="button" data-target="schedule">מערכת</button>
+      <button type="button" data-target="exams">מבחנים</button>
+      <button type="button" data-target="newsletter">עלון</button>
+    </nav>
 
     <main>
       <section class="screen active" id="screen-home" data-screen="home"></section>
@@ -270,27 +280,6 @@
       <section class="screen" id="screen-newsletter" data-screen="newsletter"></section>
     </main>
   </div>
-
-  <nav class="tabbar" role="tablist" aria-label="מסכים">
-    <div class="tabbar-inner">
-      <button class="tab" role="tab" aria-selected="true" data-target="home">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg>
-        ראשי
-      </button>
-      <button class="tab" role="tab" aria-selected="false" data-target="schedule">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3.5v3M16 3.5v3M3.5 10h17"/></svg>
-        מערכת
-      </button>
-      <button class="tab" role="tab" aria-selected="false" data-target="exams">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8.5A2.5 2.5 0 0 1 19 6.5V20l-3-1.5L13 20l-3-1.5L7 20V6.5A2.5 2.5 0 0 1 9.5 4H8z"/><path d="M10 9h5M10 13h5"/></svg>
-        מבחנים
-      </button>
-      <button class="tab" role="tab" aria-selected="false" data-target="newsletter">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v14.5A2.5 2.5 0 0 1 17.5 21H6.5A2.5 2.5 0 0 1 4 18.5V6.5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
-        עלון
-      </button>
-    </div>
-  </nav>
 
   <script>
   // ---------------------------------------------------------------------------
@@ -726,9 +715,13 @@
 
   const TZ = "Asia/Jerusalem";
   const WEEKDAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+  const HE_MONTHS = ["בינואר", "בפברואר", "במרץ", "באפריל", "במאי", "ביוני", "ביולי", "באוגוסט", "בספטמבר", "באוקטובר", "בנובמבר", "בדצמבר"];
   const TYPE_LABELS = { EXAM: "מבחן", QUIZ: "בוחן", EVENT: "אירוע", VACATION: "חופשה" };
   const EXAM_TYPES = new Set(["EXAM", "QUIZ"]);
   const SCREENS = ["home", "schedule", "exams", "newsletter"];
+  const CLASS_NAME = "ט׳3";
+
+  const state = { today: null, schedule: null, picked: null, className: CLASS_NAME };
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -743,6 +736,22 @@
       timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit",
     }).format(new Date());
     return parts; // YYYY-MM-DD
+  }
+
+  function currentHourIsrael() {
+    return Number(new Intl.DateTimeFormat("en-GB", {
+      timeZone: TZ, hour: "2-digit", hourCycle: "h23",
+    }).format(new Date()));
+  }
+
+  function greetingNow() {
+    const hour = currentHourIsrael();
+    let word;
+    if (hour >= 5 && hour < 12) word = "בוקר טוב";
+    else if (hour >= 12 && hour < 17) word = "צהריים טובים";
+    else if (hour >= 17 && hour < 22) word = "ערב טוב";
+    else word = "לילה טוב";
+    return `${word}, ג׳וני`;
   }
 
   function parseISODate(value) {
@@ -763,18 +772,30 @@
 
   function weekdayName(iso) {
     const [y, mo, d] = iso.split("-").map(Number);
-    // JS: 0=Sun ... matches WEEKDAYS
     return WEEKDAYS[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
   }
 
-  function formatDate(iso) {
+  function formatLongDate(iso) {
     const p = parseISODate(iso);
     if (!p) return "";
-    return `${p.d}.${p.mo}.${p.y}`;
+    return `יום ${weekdayName(iso)} ${p.d} ${HE_MONTHS[p.mo - 1]}`;
   }
 
-  function formatDayHeading(iso) {
-    return `יום ${weekdayName(iso)}, ${formatDate(iso)}`;
+  function formatExamDate(iso) {
+    const p = parseISODate(iso);
+    if (!p) return "";
+    return `יום ${weekdayName(iso)}, ${p.d} ${HE_MONTHS[p.mo - 1]}`;
+  }
+
+  function formatClass(name) {
+    const raw = String(name || CLASS_NAME).trim() || CLASS_NAME;
+    return raw.replace(/'/g, "׳").replace(/"/g, "״");
+  }
+
+  function headerDateLine(iso, today, className) {
+    if (!iso) return `${formatLongDate(today)} · ${formatClass(className)}`;
+    const rel = iso === addDays(today, 1) ? "מחר, " : (iso === today ? "היום, " : "");
+    return `${rel}${formatLongDate(iso)} · ${formatClass(className)}`;
   }
 
   function daysUntil(iso, today) {
@@ -792,12 +813,10 @@
     return [delta, `לפני ${Math.abs(delta)} ימים`];
   }
 
-  function urgencyKind(iso, today, type) {
-    if (!iso || !EXAM_TYPES.has(type)) return null;
+  function isUrgentCountdown(iso, today, type) {
+    if (!iso || !EXAM_TYPES.has(type)) return false;
     const delta = daysUntil(iso, today);
-    if (delta >= 0 && delta <= 1) return "red";
-    if (delta === 2) return "orange";
-    return null;
+    return delta >= 0 && delta < 3;
   }
 
   function normalizeSchedule(raw) {
@@ -851,11 +870,56 @@
     }
   }
 
-  function lessonTime(lesson) {
+  function lessonStart(lesson) {
     const start = (lesson.start || "").trim();
+    if (start) return start;
+    const time = (lesson.time || "").trim();
+    if (time) return time.split(/[–-]/)[0].trim();
     const end = (lesson.end || "").trim();
-    if (start && end) return `${start}–${end}`;
-    return start || end || (lesson.time || "");
+    return end;
+  }
+
+  function formatRoom(room) {
+    const r = String(room || "").trim();
+    if (!r) return "";
+    if (/^חדר\b/.test(r)) return r;
+    if (/^\d+$/.test(r)) return `חדר ${r}`;
+    return r;
+  }
+
+  function lessonFlag(lesson) {
+    if (!lesson || typeof lesson !== "object") return "";
+    const truthy = (v) => v === true || v === 1 || v === "1" || String(v).toLowerCase() === "true";
+    const raw = lesson.status || lesson.flag || lesson.state || lesson.change_type || "";
+    const text = String(raw).trim();
+    const lower = text.toLowerCase();
+    const cancelledWords = ["cancelled", "canceled", "cancel", "בוטל"];
+    if (
+      truthy(lesson.cancelled) || truthy(lesson.canceled) ||
+      cancelledWords.includes(lower) || text === "בוטל"
+    ) return "בוטל";
+    if (
+      truthy(lesson.changed) || truthy(lesson.substituted) ||
+      lower === "changed" || lower === "change" ||
+      lower === "substituted" || lower === "substitution" ||
+      text === "שינוי"
+    ) return "שינוי";
+    if (typeof lesson.change === "boolean" && lesson.change) return "שינוי";
+    if (typeof lesson.change === "string") {
+      const c = lesson.change.trim();
+      if (c && !["false", "0", "no"].includes(c.toLowerCase())) {
+        return cancelledWords.includes(c.toLowerCase()) || c === "בוטל" ? "בוטל" : "שינוי";
+      }
+    }
+    return "";
+  }
+
+  function examSubject(item) {
+    const type = (item.type || "").toUpperCase();
+    const typeLabel = TYPE_LABELS[type] || type || "אירוע";
+    const title = String(item.title || item.subject || typeLabel).trim();
+    const parts = title.split(/\s+[—–-]\s+/);
+    return (parts[0] || title).trim();
   }
 
   function pickHomeDay(schedule, today) {
@@ -880,114 +944,117 @@
       .slice(0, limit);
   }
 
-  function examCard(item, dateIso, today) {
-    const type = (item.type || "").toUpperCase();
-    const typeLabel = TYPE_LABELS[type] || type || "אירוע";
-    const title = item.title || item.subject || typeLabel;
-    const kind = urgencyKind(dateIso, today, type);
-    const [delta, label] = dateIso ? daysUntilLabel(dateIso, today) : [null, ""];
-    const tag = kind ? `<span class="tag tag-${kind}">${escapeHtml(label)}</span>` : "";
-    let countdown = "";
-    if (dateIso && !kind) {
-      const cls = delta < 0 ? "countdown-past" : "countdown-soon";
-      countdown = ` · <span class="${cls}">${escapeHtml(label)}</span>`;
-    }
-    const meta = [
-      `<span class="badge badge-${escapeHtml(type)}">${escapeHtml(typeLabel)}</span>`,
-      dateIso ? formatDate(dateIso) : "",
-      item.time || "",
-    ].filter(Boolean).join(" · ");
-    return `<article class="card exam${kind ? " urgent" : ""}">
-      <div class="exam-top">
-        <div class="exam-meta">${meta}${countdown}</div>
-        ${tag}
+  function lessonRow(lesson) {
+    const flag = lessonFlag(lesson);
+    const cancelled = flag === "בוטל";
+    const subject = escapeHtml(lesson.subject || "שיעור");
+    const flagHtml = flag ? `<span class="flag">${escapeHtml(flag)}</span>` : "";
+    const room = formatRoom(lesson.room);
+    const time = escapeHtml(lessonStart(lesson));
+    return `<div class="row${cancelled ? " cancelled" : ""}">
+      <div class="row-start">
+        <div class="row-top"><span class="subject">${subject}</span>${flagHtml}</div>
+        ${room ? `<div class="room">${escapeHtml(room)}</div>` : ""}
       </div>
-      <p class="exam-title">${escapeHtml(title)}</p>
-    </article>`;
+      ${time ? `<div class="time">${time}</div>` : ""}
+    </div>`;
+  }
+
+  function examRow(item, dateIso, today, opts = {}) {
+    const type = (item.type || "").toUpperCase();
+    const subject = escapeHtml(examSubject(item));
+    const typeLabel = TYPE_LABELS[type] || "";
+    let dateLine = dateIso ? formatExamDate(dateIso) : "";
+    if (opts.showType && typeLabel) {
+      dateLine = dateLine ? `${typeLabel} · ${dateLine}` : typeLabel;
+    }
+    const [delta, label] = dateIso ? daysUntilLabel(dateIso, today) : [null, ""];
+    const urgent = dateIso ? isUrgentCountdown(dateIso, today, type) : false;
+    const countHtml = label
+      ? `<div class="count${urgent ? " urgent" : ""}">${escapeHtml(label)}</div>`
+      : "";
+    return `<div class="row">
+      <div class="row-start">
+        <div class="row-top"><span class="subject">${subject}</span></div>
+        ${dateLine ? `<div class="room">${escapeHtml(dateLine)}</div>` : ""}
+      </div>
+      ${countHtml}
+    </div>`;
   }
 
   function renderHome(root, schedule, exams, today) {
     const parts = [];
     const picked = pickHomeDay(schedule, today);
     const tomorrow = addDays(today, 1);
-    if (picked && picked.isTomorrow) {
-      parts.push(`<h2 class="section">מערכת של מחר</h2>`);
-    } else {
-      parts.push(`<h2 class="section">המערכת הבאה</h2>`);
-    }
+    parts.push(`<section class="section" aria-label="המערכת"><h2 class="section-title"><button type="button" class="section-link" data-target="schedule">המערכת</button></h2>`);
     if (picked) {
       if (!picked.isTomorrow) {
-        parts.push(`<p class="info">אין לימודים מחר (${escapeHtml(formatDayHeading(tomorrow))}). מוצגת המערכת של ${escapeHtml(formatDayHeading(picked.date))}.</p>`);
+        parts.push(`<p class="info">אין לימודים מחר (${escapeHtml(formatLongDate(tomorrow))}). מוצגת המערכת של ${escapeHtml(formatLongDate(picked.date))}.</p>`);
       }
-      const className = picked.day.class || (schedule && schedule.class) || "ט'3";
-      const rows = (picked.day.lessons || []).map((lesson) => {
-        const time = escapeHtml(lessonTime(lesson));
-        const subject = escapeHtml(lesson.subject || "שיעור");
-        return `<div class="lesson-row"><span class="lesson-subject">${subject}</span><span class="lesson-time time-ltr">${time}</span></div>`;
-      }).join("");
-      parts.push(`<div class="card"><p class="kicker">${escapeHtml(formatDayHeading(picked.date))} · כיתה ${escapeHtml(className)}</p>${rows}</div>`);
+      parts.push((picked.day.lessons || []).map(lessonRow).join(""));
     } else if (schedule) {
       parts.push(`<p class="info">אין מערכת לימודים בהמשך, לפי הנתונים שיש כרגע.</p>`);
     } else {
       parts.push(`<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`);
     }
+    parts.push(`</section>`);
 
-    parts.push(`<h2 class="section">מבחנים קרובים</h2>`);
+    parts.push(`<section class="section" aria-label="מבחנים"><h2 class="section-title"><button type="button" class="section-link" data-target="exams">מבחנים</button></h2>`);
     const soon = upcomingExams(exams, today);
     if (soon.length) {
-      parts.push(soon.map((x) => examCard(x.item, x.date, today)).join(""));
+      parts.push(soon.map((x) => examRow(x.item, x.date, today)).join(""));
     } else if (exams) {
       parts.push(`<p class="info">אין מבחנים קרובים ברשימה.</p>`);
     } else {
       parts.push(`<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`);
     }
-    parts.push(`<p class="install-hint">כדי לשמור במסך הבית באייפון: פתחו ב-Safari ← לחצו על שיתוף ← הוספה למסך הבית. האפליקציה תיפתח בלי שורת כתובת, בלי שה-Mac יהיה דלוק.</p>`);
+    parts.push(`</section>`);
+    parts.push(`<button type="button" class="more-link" data-target="newsletter">עלון שבועי</button>`);
+    parts.push(`<p class="install-hint">כדי לשמור במסך הבית באייפון: פתחו ב-Safari ← לחצו על שיתוף ← הוספה למסך הבית.</p>`);
     root.innerHTML = parts.join("");
+    root.querySelectorAll("[data-target]").forEach((btn) => {
+      btn.addEventListener("click", () => showScreen(btn.dataset.target));
+    });
   }
 
   function renderSchedule(root, schedule, today) {
     if (!schedule || !(schedule.days || []).length) {
-      root.innerHTML = `<h2 class="section">מערכת שעות</h2><p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
+      root.innerHTML = `<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
       return;
     }
-    const className = schedule.class || "ט'3";
     const days = (schedule.days || []).slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""));
-    const blocks = days.map((day) => {
+    const renderDay = (day) => {
       const iso = (parseISODate(day.date) || {}).iso;
       const isToday = iso === today;
       const lessons = day.lessons || [];
-      const rows = lessons.length ? lessons.map((lesson) => {
-        const time = lessonTime(lesson);
-        const num = lesson.num ?? lesson.period;
-        const timeHtml = time ? `<span class="time-ltr">${escapeHtml(time)}</span>` : "";
-        const numHtml = (num != null && num !== "") ? ` · שיעור ${escapeHtml(num)}` : "";
-        const footer = [lesson.teacher, lesson.room ? `חדר ${lesson.room}` : ""].filter(Boolean).join(" · ");
-        return `<div class="lesson-row">
-          <div>
-            <div class="lesson-subject">${escapeHtml(lesson.subject || "שיעור")}</div>
-            ${footer ? `<div class="lesson-sub">${escapeHtml(footer)}</div>` : ""}
-          </div>
-          <span class="lesson-time">${timeHtml}${numHtml}</span>
-        </div>`;
-      }).join("") : `<p class="empty">אין שיעורים ביום זה.</p>`;
-      const titleHtml = iso
-        ? `<span class="day-name">${isToday ? "היום · " : ""}${escapeHtml(formatDayHeading(iso))}</span>`
-        : `<span class="day-name">${escapeHtml(day.day || "יום לימודים")}</span>`;
-      const countHtml = lessons.length ? `<span class="day-count">${lessons.length} שיעורים</span>` : "";
-      return `<details class="day"${isToday ? " open" : ""}>
-        <summary><span class="day-title">${titleHtml}${countHtml}</span></summary>
-        <div class="day-body">${rows}</div>
-      </details>`;
-    }).join("");
+      const rows = lessons.length
+        ? lessons.map(lessonRow).join("")
+        : `<p class="empty">אין שיעורים ביום זה.</p>`;
+      let title;
+      if (iso) title = `${isToday ? "היום · " : ""}${formatLongDate(iso)}`;
+      else title = day.day || "יום לימודים";
+      return `<section class="section"><h2 class="section-title">${escapeHtml(title)}</h2>${rows}</section>`;
+    };
+    const upcoming = days.filter((day) => {
+      const iso = (parseISODate(day.date) || {}).iso;
+      return !iso || iso >= today;
+    });
+    const past = days.filter((day) => {
+      const iso = (parseISODate(day.date) || {}).iso;
+      return iso && iso < today;
+    }).reverse();
     const shabbat = weekdayName(today) === "שבת"
-      ? `<p class="info">היום שבת — אין לימודים. אפשר לפתוח כל יום במערכת.</p>`
+      ? `<p class="info">היום שבת — אין לימודים.</p>`
       : "";
-    root.innerHTML = `<h2 class="section">מערכת שעות</h2><p class="kicker">כיתה ${escapeHtml(className)}</p>${shabbat}${blocks}`;
+    const pastBlock = past.length
+      ? `<section class="section"><h2 class="section-title">ימים שעברו</h2></section>` + past.map(renderDay).join("")
+      : "";
+    root.innerHTML = `${shabbat}${upcoming.map(renderDay).join("")}${pastBlock}`;
   }
 
   function renderExams(root, exams, today) {
     if (!exams || !(exams.events || []).length) {
-      root.innerHTML = `<h2 class="section">מבחנים ואירועים</h2><p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
+      root.innerHTML = `<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
       return;
     }
     const dated = [];
@@ -1000,45 +1067,67 @@
     dated.sort((a, b) => a.date.localeCompare(b.date) || String(a.item.type).localeCompare(String(b.item.type)));
     const upcoming = dated.filter((x) => x.date >= today);
     const past = dated.filter((x) => x.date < today).reverse();
-    const parts = [`<h2 class="section">מבחנים ואירועים</h2>`];
+    const parts = [];
     if (upcoming.length) {
-      parts.push(`<p class="kicker">קרובים · ${upcoming.length}</p>`);
-      parts.push(upcoming.map((x) => examCard(x.item, x.date, today)).join(""));
+      parts.push(`<section class="section" aria-label="קרובים"><h2 class="section-title">קרובים</h2>`);
+      parts.push(upcoming.map((x) => examRow(x.item, x.date, today, { showType: true })).join(""));
+      parts.push(`</section>`);
     } else {
       parts.push(`<p class="info">אין מבחנים או אירועים קרובים ברשימה.</p>`);
     }
     if (undated.length) {
-      parts.push(`<p class="kicker">ללא תאריך</p>`);
-      parts.push(undated.map((item) => examCard(item, null, today)).join(""));
+      parts.push(`<section class="section" aria-label="ללא תאריך"><h2 class="section-title">ללא תאריך</h2>`);
+      parts.push(undated.map((item) => examRow(item, null, today, { showType: true })).join(""));
+      parts.push(`</section>`);
     }
     if (past.length) {
-      parts.push(`<details class="day"><summary>אירועים שעברו · ${past.length}</summary><div class="day-body">`);
-      parts.push(past.map((x) => examCard(x.item, x.date, today)).join(""));
-      parts.push(`</div></details>`);
+      parts.push(`<section class="section" aria-label="אירועים שעברו"><h2 class="section-title">אירועים שעברו</h2>`);
+      parts.push(past.map((x) => examRow(x.item, x.date, today, { showType: true })).join(""));
+      parts.push(`</section>`);
     }
     root.innerHTML = parts.join("");
   }
 
   function renderNewsletter(root, newsletter) {
     if (!newsletter) {
-      root.innerHTML = `<h2 class="section">עלון שבועי</h2><p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
+      root.innerHTML = `<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
       return;
     }
-    const parts = [`<h2 class="section">עלון שבועי</h2>`];
-    parts.push(`<p class="newsletter-title">${escapeHtml(newsletter.title || "עלון שבועי")}</p>`);
-    if (newsletter.date) {
-      const iso = (parseISODate(newsletter.date) || {}).iso;
-      if (iso) parts.push(`<p class="kicker">${escapeHtml(formatDate(iso))}</p>`);
+    const parts = [];
+    const title = newsletter.title || "עלון שבועי";
+    parts.push(`<p class="newsletter-title">${escapeHtml(title)}</p>`);
+    const iso = (parseISODate(newsletter.date) || {}).iso;
+    if (iso) {
+      const p = parseISODate(iso);
+      parts.push(`<p class="newsletter-date">${p.d} ${HE_MONTHS[p.mo - 1]}</p>`);
     }
-    if (newsletter.intro) {
-      parts.push(`<div class="card"><p class="newsletter-body">${escapeHtml(newsletter.intro)}</p></div>`);
+    const intro = (newsletter.intro || "").trim();
+    if (intro) parts.push(`<p class="intro">${escapeHtml(intro)}</p>`);
+    const sections = newsletter.sections || [];
+    const visible = sections.filter((section) => section && typeof section === "object");
+    if (!intro && !visible.length) {
+      parts.push(`<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`);
     }
-    for (const section of newsletter.sections || []) {
+    for (const section of visible) {
       const heading = (section.heading || "").trim();
       const body = (section.body || "").trim();
-      parts.push(`<div class="card">${heading ? `<p class="exam-title">${escapeHtml(heading)}</p>` : ""}<p class="newsletter-body">${escapeHtml(body)}</p></div>`);
+      parts.push(`<section class="section">`);
+      if (heading) parts.push(`<h2 class="section-title">${escapeHtml(heading)}</h2>`);
+      if (body) parts.push(`<p class="newsletter-body">${escapeHtml(body)}</p>`);
+      parts.push(`</section>`);
     }
     root.innerHTML = parts.join("");
+  }
+
+  function updateHeader(screen) {
+    document.getElementById("greeting").textContent = greetingNow();
+    const dateEl = document.getElementById("date-line");
+    const className = state.className;
+    if (screen === "home" && state.picked) {
+      dateEl.textContent = headerDateLine(state.picked.date, state.today, className);
+    } else {
+      dateEl.textContent = headerDateLine(state.today, state.today, className);
+    }
   }
 
   function showScreen(name) {
@@ -1046,9 +1135,12 @@
     document.querySelectorAll(".screen").forEach((el) => {
       el.classList.toggle("active", el.dataset.screen === target);
     });
-    document.querySelectorAll(".tab").forEach((btn) => {
+    const nav = document.getElementById("text-nav");
+    nav.classList.toggle("visible", target !== "home");
+    nav.querySelectorAll("button").forEach((btn) => {
       btn.setAttribute("aria-selected", btn.dataset.target === target ? "true" : "false");
     });
+    updateHeader(target);
     if (location.hash.replace("#", "") !== target) {
       history.replaceState(null, "", `#${target}`);
     }
@@ -1061,7 +1153,15 @@
     const exams = normalizeExams(raw.exams);
     const newsletter = normalizeNewsletter(raw.newsletter);
     const isExample = !!(schedule && schedule.is_example) || !!(exams && exams.is_example) || !!(newsletter && newsletter.is_example);
-    document.getElementById("today-label").textContent = `היום ${formatDayHeading(today)}`;
+    const picked = pickHomeDay(schedule, today);
+    const className = formatClass(
+      (picked && picked.day && picked.day.class) || (schedule && schedule.class) || CLASS_NAME
+    );
+    state.today = today;
+    state.schedule = schedule;
+    state.picked = picked;
+    state.className = className;
+
     const banner = document.getElementById("example-banner");
     banner.hidden = !isExample;
     renderHome(document.getElementById("screen-home"), schedule, exams, today);
@@ -1069,7 +1169,7 @@
     renderExams(document.getElementById("screen-exams"), exams, today);
     renderNewsletter(document.getElementById("screen-newsletter"), newsletter);
 
-    document.querySelectorAll(".tab").forEach((btn) => {
+    document.getElementById("text-nav").querySelectorAll("button").forEach((btn) => {
       btn.addEventListener("click", () => showScreen(btn.dataset.target));
     });
     window.addEventListener("hashchange", () => showScreen(location.hash.replace("#", "")));
