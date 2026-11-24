@@ -172,13 +172,21 @@
     .time {
       font-size: 15px;
       font-weight: 400;
-      color: var(--black);
+      color: var(--muted);
       font-variant-numeric: tabular-nums;
       direction: ltr;
       unicode-bidi: isolate;
       flex-shrink: 0;
       line-height: 1.25;
       letter-spacing: -0.1px;
+    }
+
+    .done-mark {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.25;
+      flex-shrink: 0;
     }
 
     .flag {
@@ -290,8 +298,10 @@
   // school sources from this app.
   //
   // schedule: {date, class, lessons:[{num, start, end, subject, teacher, room,
-  //   status}]}. start/end/status may be null. A list of days, or
-  //   {is_example, class, days:[...]}, is also accepted.
+  //   status}]}. start/end/status may be null. When start/end are null, times
+  //   are filled from the built-in bell schedule (BELL_SCHEDULE) by lesson num
+  //   (1-based period). A list of days, or {is_example, class, days:[...]},
+  //   is also accepted.
   // exams: [{eventDate, type: EXAM|QUIZ|EVENT|VACATION, title}]
   //   or {is_example, events:[...]}.
   // newsletter: {title, date, intro, sections:[{heading, body}]}.
@@ -425,7 +435,21 @@
   const SCREENS = ["home", "schedule", "exams", "newsletter"];
   const CLASS_NAME = "ט׳3";
 
-  const state = { today: null, schedule: null, picked: null, className: CLASS_NAME };
+  // Built-in bell schedule. Daft's data often has start/end = null; we fill
+  // from here by 1-based period number (schedule.json "num").
+  const BELL_SCHEDULE = {
+    1: { start: "08:30", end: "09:15" },
+    2: { start: "09:15", end: "10:05" },
+    3: { start: "10:20", end: "11:05" },
+    4: { start: "11:05", end: "11:50" },
+    5: { start: "12:10", end: "12:55" },
+    6: { start: "12:55", end: "13:40" },
+    7: { start: "13:55", end: "14:40" },
+    8: { start: "14:40", end: "15:25" },
+    9: { start: "15:30", end: "16:15" },
+  };
+
+  const state = { today: null, schedule: null, exams: null, newsletter: null, isExample: false, picked: null, className: CLASS_NAME };
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -523,18 +547,40 @@
     return delta >= 0 && delta < 3;
   }
 
+  function bellFor(num) {
+    const n = Number(num);
+    if (!Number.isInteger(n) || n < 1) return null;
+    return BELL_SCHEDULE[n] || null;
+  }
+
+  function fillLessonTimes(lesson, index) {
+    if (!lesson || typeof lesson !== "object") return lesson;
+    const num = lesson.num != null && lesson.num !== "" ? lesson.num : (index + 1);
+    const bells = bellFor(num);
+    const start = timeText(lesson.start) || (bells && bells.start) || "";
+    const end = timeText(lesson.end) || (bells && bells.end) || "";
+    return { ...lesson, num, start: start || null, end: end || null };
+  }
+
+  function fillDayTimes(day) {
+    if (!day || typeof day !== "object") return day;
+    const lessons = Array.isArray(day.lessons) ? day.lessons.map(fillLessonTimes) : day.lessons;
+    return { ...day, lessons };
+  }
+
   function normalizeSchedule(raw) {
     if (!raw) return null;
+    let result = null;
     if (Array.isArray(raw)) {
-      return { is_example: false, class: raw[0] && raw[0].class, days: raw };
+      result = { is_example: false, class: raw[0] && raw[0].class, days: raw };
+    } else if (Array.isArray(raw.days)) {
+      result = { is_example: !!raw.is_example, class: raw.class || raw.class_name, days: raw.days };
+    } else if (raw.lessons || raw.date) {
+      result = { is_example: !!raw.is_example, class: raw.class || raw.class_name, days: [raw] };
     }
-    if (Array.isArray(raw.days)) {
-      return { is_example: !!raw.is_example, class: raw.class || raw.class_name, days: raw.days };
-    }
-    if (raw.lessons || raw.date) {
-      return { is_example: !!raw.is_example, class: raw.class || raw.class_name, days: [raw] };
-    }
-    return null;
+    if (!result) return null;
+    result.days = (result.days || []).map(fillDayTimes);
+    return result;
   }
 
   function normalizeExams(raw) {
@@ -587,6 +633,48 @@
     const time = timeText(lesson && lesson.time);
     if (time) return time.split(/[–-]/)[0].trim();
     return timeText(lesson && lesson.end);
+  }
+
+  function formatLessonTime(lesson) {
+    const start = timeText(lesson && lesson.start) || lessonStart(lesson);
+    const end = timeText(lesson && lesson.end);
+    if (start && end) return `${start}–${end}`;
+    return start || end || "";
+  }
+
+  function parseTimeMinutes(value) {
+    const text = timeText(value);
+    if (!text) return null;
+    const m = text.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+    if (!m) return null;
+    const h = Number(m[1]), min = Number(m[2]);
+    if (h > 23 || min > 59) return null;
+    return h * 60 + min;
+  }
+
+  function nowIsrael() {
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: TZ,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    }).formatToParts(new Date());
+    const get = (type) => parts.find((p) => p.type === type).value;
+    const hour = Number(get("hour"));
+    const minute = Number(get("minute"));
+    return {
+      date: `${get("year")}-${get("month")}-${get("day")}`,
+      hour,
+      minute,
+      minutes: hour * 60 + minute,
+    };
+  }
+
+  function isLessonDone(lesson, dayIso) {
+    if (!dayIso || dayIso !== todayIsrael()) return false;
+    if (lessonFlag(lesson) === "בוטל") return false;
+    const end = parseTimeMinutes(lesson && lesson.end);
+    if (end == null) return false;
+    return nowIsrael().minutes >= end;
   }
 
   function formatRoom(room) {
@@ -656,16 +744,19 @@
       .slice(0, limit);
   }
 
-  function lessonRow(lesson) {
-    const flag = lessonFlag(lesson);
+  function lessonRow(lesson, dayIso) {
+    const filled = fillLessonTimes(lesson, Number(lesson && lesson.num) ? Number(lesson.num) - 1 : 0);
+    const flag = lessonFlag(filled);
     const cancelled = flag === "בוטל";
-    const subject = escapeHtml(lesson.subject || "שיעור");
+    const subject = escapeHtml(filled.subject || "שיעור");
     const flagHtml = flag ? `<span class="flag">${escapeHtml(flag)}</span>` : "";
-    const room = formatRoom(lesson.room);
-    const time = escapeHtml(lessonStart(lesson));
-    return `<div class="row${cancelled ? " cancelled" : ""}">
+    const done = isLessonDone(filled, dayIso);
+    const checkHtml = done ? `<span class="done-mark" aria-label="השיעור הסתיים">✓</span>` : "";
+    const room = formatRoom(filled.room);
+    const time = escapeHtml(formatLessonTime(filled));
+    return `<div class="row${cancelled ? " cancelled" : ""}${done ? " done" : ""}">
       <div class="row-start">
-        <div class="row-top"><span class="subject">${subject}</span>${flagHtml}</div>
+        <div class="row-top"><span class="subject">${subject}</span>${checkHtml}${flagHtml}</div>
         ${room ? `<div class="room">${escapeHtml(room)}</div>` : ""}
       </div>
       ${time ? `<div class="time">${time}</div>` : ""}
@@ -707,7 +798,7 @@
       } else {
         parts.push(`<p class="info">אין לימודים מחר (${escapeHtml(formatLongDate(tomorrow))}). מוצגת המערכת של ${escapeHtml(formatLongDate(picked.date))}.</p>`);
       }
-      parts.push((picked.day.lessons || []).map(lessonRow).join(""));
+      parts.push((picked.day.lessons || []).map((lesson) => lessonRow(lesson, picked.date)).join(""));
     } else if (schedule) {
       parts.push(`<p class="info">המערכת למחר עוד לא עודכנה.</p>`);
     } else {
@@ -744,7 +835,7 @@
       const isToday = iso === today;
       const lessons = day.lessons || [];
       const rows = lessons.length
-        ? lessons.map(lessonRow).join("")
+        ? lessons.map((lesson) => lessonRow(lesson, iso)).join("")
         : `<p class="empty">אין שיעורים ביום זה.</p>`;
       let title;
       if (iso) title = `${isToday ? "היום · " : ""}${formatLongDate(iso)}`;
@@ -863,27 +954,41 @@
     window.scrollTo(0, 0);
   }
 
-  function boot(raw) {
+  function renderAll() {
     const today = todayIsrael();
-    const schedule = normalizeSchedule(raw.schedule);
-    const exams = normalizeExams(raw.exams);
-    const newsletter = normalizeNewsletter(raw.newsletter);
-    const isExample = !!(schedule && schedule.is_example) || !!(exams && exams.is_example) || !!(newsletter && newsletter.is_example);
+    const schedule = state.schedule;
+    const exams = state.exams;
+    const newsletter = state.newsletter;
     const picked = pickHomeDay(schedule, today);
     const className = formatClass(
       (picked && picked.day && picked.day.class) || (schedule && schedule.class) || CLASS_NAME
     );
     state.today = today;
-    state.schedule = schedule;
     state.picked = picked;
     state.className = className;
 
     const banner = document.getElementById("example-banner");
-    banner.hidden = !isExample;
+    banner.hidden = !state.isExample;
     renderHome(document.getElementById("screen-home"), schedule, exams, today);
     renderSchedule(document.getElementById("screen-schedule"), schedule, today);
     renderExams(document.getElementById("screen-exams"), exams, today);
     renderNewsletter(document.getElementById("screen-newsletter"), newsletter);
+    const current = location.hash.replace("#", "");
+    const screen = SCREENS.includes(current) ? current : "home";
+    if (document.getElementById("greeting").textContent) updateHeader(screen);
+  }
+
+  function boot(raw) {
+    const schedule = normalizeSchedule(raw.schedule);
+    const exams = normalizeExams(raw.exams);
+    const newsletter = normalizeNewsletter(raw.newsletter);
+    const isExample = !!(schedule && schedule.is_example) || !!(exams && exams.is_example) || !!(newsletter && newsletter.is_example);
+    state.schedule = schedule;
+    state.exams = exams;
+    state.newsletter = newsletter;
+    state.isExample = isExample;
+
+    renderAll();
 
     document.getElementById("text-nav").querySelectorAll("button").forEach((btn) => {
       btn.addEventListener("click", () => showScreen(btn.dataset.target));
@@ -891,6 +996,11 @@
     window.addEventListener("hashchange", () => showScreen(location.hash.replace("#", "")));
     const initial = location.hash.replace("#", "") || "home";
     showScreen(initial);
+
+    setInterval(renderAll, 60 * 1000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") renderAll();
+    });
   }
 
   loadData().then(boot);
