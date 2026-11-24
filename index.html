@@ -284,432 +284,136 @@
   <script>
   // ---------------------------------------------------------------------------
   // TODO: Daft data plugs in here
-  // Embedded example data (Daft schemas). When Daft provides real files, drop
-  // them in data/schedule.json, data/exams.json and data/newsletter.json.
-  // loadData() tries those files first via fetch, then falls back to this block.
-  // Do not scrape or fetch remote school sources from this app.
+  // Live data lives in data/schedule.json, data/exams.json and
+  // data/newsletter.json. loadData() tries those files first via fetch, then
+  // falls back to this block (same real data). Do not scrape or fetch remote
+  // school sources from this app.
   //
-  // schedule: {date, class, lessons:[{num, start, end, subject, teacher, room}]}
-  //   or a list of those days, or {is_example, class, days:[...]}.
+  // schedule: {date, class, lessons:[{num, start, end, subject, teacher, room,
+  //   status}]}. start/end/status may be null. A list of days, or
+  //   {is_example, class, days:[...]}, is also accepted.
   // exams: [{eventDate, type: EXAM|QUIZ|EVENT|VACATION, title}]
   //   or {is_example, events:[...]}.
   // newsletter: {title, date, intro, sections:[{heading, body}]}.
   // ---------------------------------------------------------------------------
   const EMBEDDED_DATA = {
-  "schedule": {
-    "is_example": true,
-    "note": "EXAMPLE DATA — replace with structured data from Daft. Do not scrape. Each item in days follows Daft's schedule.json day shape: {date, class, lessons:[{num, start, end, subject, teacher, room}]}. A single day object or a bare list of days is also accepted.",
-    "class": "ט'3",
-    "days": [
-      {
-        "date": "2026-11-22",
-        "class": "ט'3",
-        "lessons": [
-          {
-            "num": 1,
-            "start": "08:00",
-            "end": "08:45",
-            "subject": "מתמטיקה",
-            "teacher": "רותם כהן",
-            "room": "12"
-          },
-          {
-            "num": 2,
-            "start": "08:50",
-            "end": "09:35",
-            "subject": "עברית",
-            "teacher": "נועה לוי",
-            "room": "12"
-          },
-          {
-            "num": 3,
-            "start": "09:50",
-            "end": "10:35",
-            "subject": "אנגלית",
-            "teacher": "Maya Green",
-            "room": "8"
-          },
-          {
-            "num": 4,
-            "start": "10:40",
-            "end": "11:25",
-            "subject": "היסטוריה",
-            "teacher": "יוסי מזרחי",
-            "room": "12"
-          },
-          {
-            "num": 5,
-            "start": "11:40",
-            "end": "12:25",
-            "subject": "מדעים",
-            "teacher": "דנה שפירא",
-            "room": "מעבדה"
-          },
-          {
-            "num": 6,
-            "start": "12:30",
-            "end": "13:15",
-            "subject": "תנ״ך",
-            "teacher": "אביגיל ברק",
-            "room": "12"
-          },
-          {
-            "num": 7,
-            "start": "13:20",
-            "end": "14:05",
-            "subject": "חינוך גופני",
-            "teacher": "עידן פז",
-            "room": "אולם"
-          }
-        ]
-      },
-      {
-        "date": "2026-11-23",
-        "class": "ט'3",
-        "lessons": [
-          {
-            "num": 1,
-            "start": "08:00",
-            "end": "08:45",
-            "subject": "אנגלית",
-            "teacher": "Maya Green",
-            "room": "8"
-          },
-          {
-            "num": 2,
-            "start": "08:50",
-            "end": "09:35",
-            "subject": "מתמטיקה",
-            "teacher": "רותם כהן",
-            "room": "12"
-          },
-          {
-            "num": 3,
-            "start": "09:50",
-            "end": "10:35",
-            "subject": "ספרות",
-            "teacher": "נועה לוי",
-            "room": "12"
-          },
-          {
-            "num": 4,
-            "start": "10:40",
-            "end": "11:25",
-            "subject": "אזרחות",
-            "teacher": "יוסי מזרחי",
-            "room": "12"
-          },
-          {
-            "num": 5,
-            "start": "11:40",
-            "end": "12:25",
-            "subject": "גאוגרפיה",
-            "teacher": "תמר אביב",
-            "room": "15"
-          },
-          {
-            "num": 6,
-            "start": "12:30",
-            "end": "13:15",
-            "subject": "חינוך",
-            "teacher": "רותם כהן",
-            "room": "12"
-          },
-          {
-            "num": 7,
-            "start": "13:20",
-            "end": "14:05",
-            "subject": "אומנות",
-            "teacher": "ליאור חדד",
-            "room": "סטודיו"
-          }
-        ]
-      },
-      {
-        "date": "2026-11-24",
-        "class": "ט'3",
-        "lessons": [
-          {
-            "num": 1,
-            "start": "08:00",
-            "end": "08:45",
-            "subject": "מדעים",
-            "teacher": "דנה שפירא",
-            "room": "מעבדה"
-          },
-          {
-            "num": 2,
-            "start": "08:50",
-            "end": "09:35",
-            "subject": "מדעים",
-            "teacher": "דנה שפירא",
-            "room": "מעבדה"
-          },
-          {
-            "num": 3,
-            "start": "09:50",
-            "end": "10:35",
-            "subject": "מתמטיקה",
-            "teacher": "רותם כהן",
-            "room": "12"
-          },
-          {
-            "num": 4,
-            "start": "10:40",
-            "end": "11:25",
-            "subject": "עברית",
-            "teacher": "נועה לוי",
-            "room": "12"
-          },
-          {
-            "num": 5,
-            "start": "11:40",
-            "end": "12:25",
-            "subject": "היסטוריה",
-            "teacher": "יוסי מזרחי",
-            "room": "12"
-          },
-          {
-            "num": 6,
-            "start": "12:30",
-            "end": "13:15",
-            "subject": "אנגלית",
-            "teacher": "Maya Green",
-            "room": "8"
-          }
-        ]
-      },
-      {
-        "date": "2026-11-25",
-        "class": "ט'3",
-        "lessons": [
-          {
-            "num": 1,
-            "start": "08:00",
-            "end": "08:45",
-            "subject": "תנ״ך",
-            "teacher": "אביגיל ברק",
-            "room": "12"
-          },
-          {
-            "num": 2,
-            "start": "08:50",
-            "end": "09:35",
-            "subject": "מתמטיקה",
-            "teacher": "רותם כהן",
-            "room": "12"
-          },
-          {
-            "num": 3,
-            "start": "09:50",
-            "end": "10:35",
-            "subject": "אנגלית",
-            "teacher": "Maya Green",
-            "room": "8"
-          },
-          {
-            "num": 4,
-            "start": "10:40",
-            "end": "11:25",
-            "subject": "ספרות",
-            "teacher": "נועה לוי",
-            "room": "12"
-          },
-          {
-            "num": 5,
-            "start": "11:40",
-            "end": "12:25",
-            "subject": "חינוך גופני",
-            "teacher": "עידן פז",
-            "room": "אולם"
-          },
-          {
-            "num": 6,
-            "start": "12:30",
-            "end": "13:15",
-            "subject": "מחשבים",
-            "teacher": "שירה נחום",
-            "room": "מחשבים"
-          },
-          {
-            "num": 7,
-            "start": "13:20",
-            "end": "14:05",
-            "subject": "מחשבים",
-            "teacher": "שירה נחום",
-            "room": "מחשבים"
-          }
-        ]
-      },
-      {
-        "date": "2026-11-26",
-        "class": "ט'3",
-        "lessons": [
-          {
-            "num": 1,
-            "start": "08:00",
-            "end": "08:45",
-            "subject": "עברית",
-            "teacher": "נועה לוי",
-            "room": "12"
-          },
-          {
-            "num": 2,
-            "start": "08:50",
-            "end": "09:35",
-            "subject": "היסטוריה",
-            "teacher": "יוסי מזרחי",
-            "room": "12"
-          },
-          {
-            "num": 3,
-            "start": "09:50",
-            "end": "10:35",
-            "subject": "מתמטיקה",
-            "teacher": "רותם כהן",
-            "room": "12"
-          },
-          {
-            "num": 4,
-            "start": "10:40",
-            "end": "11:25",
-            "subject": "אזרחות",
-            "teacher": "יוסי מזרחי",
-            "room": "12"
-          },
-          {
-            "num": 5,
-            "start": "11:40",
-            "end": "12:25",
-            "subject": "מוזיקה",
-            "teacher": "אלון דהן",
-            "room": "חדר מוזיקה"
-          },
-          {
-            "num": 6,
-            "start": "12:30",
-            "end": "13:15",
-            "subject": "אנגלית",
-            "teacher": "Maya Green",
-            "room": "8"
-          }
-        ]
-      },
-      {
-        "date": "2026-11-27",
-        "class": "ט'3",
-        "lessons": [
-          {
-            "num": 1,
-            "start": "08:00",
-            "end": "08:45",
-            "subject": "חינוך",
-            "teacher": "רותם כהן",
-            "room": "12"
-          },
-          {
-            "num": 2,
-            "start": "08:50",
-            "end": "09:35",
-            "subject": "תנ״ך",
-            "teacher": "אביגיל ברק",
-            "room": "12"
-          },
-          {
-            "num": 3,
-            "start": "09:50",
-            "end": "10:35",
-            "subject": "מתמטיקה",
-            "teacher": "רותם כהן",
-            "room": "12"
-          },
-          {
-            "num": 4,
-            "start": "10:40",
-            "end": "11:15",
-            "subject": "שיעור שבועי / שיחה",
-            "teacher": "רותם כהן",
-            "room": "12"
-          }
-        ]
-      }
-    ]
-  },
-  "exams": {
-    "is_example": true,
-    "note": "EXAMPLE DATA — replace with structured data from Daft. Do not scrape. events[] matches the exams-board API shape: eventDate, type (EXAM, QUIZ, EVENT, VACATION), title. A bare list of events is also accepted.",
-    "events": [
-      {
-        "eventDate": "2026-11-18",
-        "type": "QUIZ",
-        "title": "גאוגרפיה — אקלים ישראל"
-      },
-      {
-        "eventDate": "2026-11-26",
-        "type": "QUIZ",
-        "title": "אנגלית — Unseen + Vocabulary, Unit 3"
-      },
-      {
-        "eventDate": "2026-11-30",
-        "type": "EXAM",
-        "title": "היסטוריה — מלחמת העולם הראשונה"
-      },
-      {
-        "eventDate": "2026-12-03",
-        "type": "EXAM",
-        "title": "מתמטיקה — משוואות ומערכות משוואות"
-      },
-      {
-        "eventDate": "2026-12-07",
-        "type": "EVENT",
-        "title": "סיור במוזיאון (נרשמים עד יום רביעי)"
-      },
-      {
-        "eventDate": "2026-12-08",
-        "type": "EXAM",
-        "title": "עברית — הבעה בכתב ותחביר"
-      },
-      {
-        "eventDate": "2026-12-14",
-        "type": "EXAM",
-        "title": "מדעים — תא ומערכות בגוף האדם"
-      },
-      {
-        "eventDate": "2026-12-16",
-        "type": "EVENT",
-        "title": "מעבדה במדעים (השלמה למבחן)"
-      },
-      {
-        "eventDate": "2026-12-24",
-        "type": "VACATION",
-        "title": "חופשת חנוכה (תחילה)"
-      }
-    ]
-  },
+  "schedule": [
+    {
+      "date": "2026-11-24",
+      "class": "ט׳3",
+      "lessons": [
+        {
+          "num": 1,
+          "start": null,
+          "end": null,
+          "subject": "היסטוריה",
+          "teacher": "לין",
+          "room": "ט׳3",
+          "status": null
+        },
+        {
+          "num": 2,
+          "start": null,
+          "end": null,
+          "subject": "חינוך גופני/ספרדית",
+          "teacher": "בתיה/אינה",
+          "room": null,
+          "status": null
+        },
+        {
+          "num": 3,
+          "start": null,
+          "end": null,
+          "subject": "ביולוגיה",
+          "teacher": "רונית",
+          "room": "ט׳3",
+          "status": null
+        },
+        {
+          "num": 4,
+          "start": null,
+          "end": null,
+          "subject": "מתמטיקה",
+          "teacher": "קרן/חגית",
+          "room": null,
+          "status": null
+        },
+        {
+          "num": 5,
+          "start": null,
+          "end": null,
+          "subject": "מתמטיקה",
+          "teacher": "קרן/חגית",
+          "room": null,
+          "status": null
+        }
+      ]
+    }
+  ],
+  "exams": [
+    {
+      "eventDate": "2026-11-26",
+      "type": "EVENT",
+      "title": "רב תרבותי- סיור בפלמחים"
+    },
+    {
+      "eventDate": "2026-12-01",
+      "type": "EXAM",
+      "title": "ביולגיה"
+    },
+    {
+      "eventDate": "2026-12-03",
+      "type": "EXAM",
+      "title": "עברית"
+    },
+    {
+      "eventDate": "2026-12-13",
+      "type": "EVENT",
+      "title": "רופא שיניים"
+    },
+    {
+      "eventDate": "2026-12-14",
+      "type": "QUIZ",
+      "title": "מתמטיקה"
+    },
+    {
+      "eventDate": "2026-12-17",
+      "type": "EXAM",
+      "title": "פיזיקה"
+    },
+    {
+      "eventDate": "2026-12-21",
+      "type": "EXAM",
+      "title": "אנגלית"
+    },
+    {
+      "eventDate": "2026-12-28",
+      "type": "QUIZ",
+      "title": "מתמטיקה"
+    },
+    {
+      "eventDate": "2026-12-31",
+      "type": "EVENT",
+      "title": "רב תרבותי- סיור לרמלה"
+    },
+    {
+      "eventDate": "2027-01-05",
+      "type": "EXAM",
+      "title": "ערבית"
+    },
+    {
+      "eventDate": "2027-03-17",
+      "type": "EVENT",
+      "title": "טיול מסלול רב תרבותי"
+    },
+    {
+      "eventDate": "2027-03-18",
+      "type": "EVENT",
+      "title": "טיול מסלול רב תרבותי"
+    }
+  ],
   "newsletter": {
-    "is_example": true,
-    "note": "EXAMPLE DATA — replace this file with structured data from Daft. Do not scrape.",
-    "title": "העלון השבועי של ט׳3",
-    "date": "2026-11-23",
-    "intro": "שבוע טוב לכולם! זהו עלון לדוגמה בלבד. כש-Daft יעביר את העלון האמיתי, הוא יופיע כאן במקומו.",
-    "sections": [
-      {
-        "heading": "הודעות חשובות",
-        "body": "ביום רביעי השיעורים האחרונים (מחשבים) יתקיימו בחדר 3 במקום בחדר המחשבים, בגלל תחזוקה.\n\nביום שישי הלימודים מסתיימים בשעה 11:15. נא להגיע עם ציוד ספורט ביום ראשון הבא."
-      },
-      {
-        "heading": "מבחנים קרובים",
-        "body": "יום חמישי 26.11 — בוחן באנגלית (Unseen + אוצר מילים).\nיום שני 30.11 — מבחן בהיסטוריה על מלחמת העולם הראשונה.\nיום חמישי 3.12 — מבחן במתמטיקה (משוואות)."
-      },
-      {
-        "heading": "פעילויות וטיולים",
-        "body": "נרשמים לסיור במוזיאון עד יום רביעי בבוקר אצל המחנכת. מי שטרם החזיר טופס חתום — נא להביא השבוע."
-      },
-      {
-        "heading": "מהמחנכת",
-        "body": "כל הכבוד על האווירה בכיתה בשבוע שעבר. ממשיכים כך, ומי שצריך עזרה לקראת המבחנים מוזמן לגשת אליי בהפסקה הגדולה."
-      }
-    ]
+    "title": "העלון השבועי של ט׳3"
   }
 };
 
@@ -862,7 +566,7 @@
   }
 
   async function loadData() {
-    // Try local data/*.json first (Daft drop-in). Fall back to embedded examples.
+    // Try local data/*.json first (Daft drop-in). Fall back to the embedded copy of the same data.
     try {
       return await loadFromFiles();
     } catch {
@@ -870,13 +574,19 @@
     }
   }
 
+  function timeText(value) {
+    if (value == null || value === false) return "";
+    const text = String(value).trim();
+    if (!text || /^(null|undefined|none|n\/a)$/i.test(text)) return "";
+    return text;
+  }
+
   function lessonStart(lesson) {
-    const start = (lesson.start || "").trim();
+    const start = timeText(lesson && lesson.start);
     if (start) return start;
-    const time = (lesson.time || "").trim();
+    const time = timeText(lesson && lesson.time);
     if (time) return time.split(/[–-]/)[0].trim();
-    const end = (lesson.end || "").trim();
-    return end;
+    return timeText(lesson && lesson.end);
   }
 
   function formatRoom(room) {
@@ -929,9 +639,11 @@
       .filter((x) => x.date && (x.day.lessons || []).length)
       .sort((a, b) => a.date.localeCompare(b.date));
     const exact = days.find((x) => x.date === tomorrow);
-    if (exact) return { date: exact.date, day: exact.day, isTomorrow: true };
+    if (exact) return { date: exact.date, day: exact.day, kind: "tomorrow", isTomorrow: true };
     const next = days.find((x) => x.date > today);
-    if (next) return { date: next.date, day: next.day, isTomorrow: false };
+    if (next) return { date: next.date, day: next.day, kind: "upcoming", isTomorrow: false };
+    const todayExact = days.find((x) => x.date === today);
+    if (todayExact) return { date: todayExact.date, day: todayExact.day, kind: "today", isTomorrow: false };
     return null;
   }
 
@@ -988,12 +700,16 @@
     const tomorrow = addDays(today, 1);
     parts.push(`<section class="section" aria-label="המערכת"><h2 class="section-title"><button type="button" class="section-link" data-target="schedule">המערכת</button></h2>`);
     if (picked) {
-      if (!picked.isTomorrow) {
+      if (picked.isTomorrow) {
+        // Tomorrow's timetable is in the data — no extra note needed.
+      } else if (picked.kind === "today" || picked.date === today) {
+        parts.push(`<p class="info">המערכת למחר עוד לא עודכנה. מוצגת המערכת של ${escapeHtml(formatLongDate(picked.date))}.</p>`);
+      } else {
         parts.push(`<p class="info">אין לימודים מחר (${escapeHtml(formatLongDate(tomorrow))}). מוצגת המערכת של ${escapeHtml(formatLongDate(picked.date))}.</p>`);
       }
       parts.push((picked.day.lessons || []).map(lessonRow).join(""));
     } else if (schedule) {
-      parts.push(`<p class="info">אין מערכת לימודים בהמשך, לפי הנתונים שיש כרגע.</p>`);
+      parts.push(`<p class="info">המערכת למחר עוד לא עודכנה.</p>`);
     } else {
       parts.push(`<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`);
     }

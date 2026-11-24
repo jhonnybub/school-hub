@@ -1,51 +1,62 @@
-{
-  "is_example": true,
-  "note": "EXAMPLE DATA — replace with structured data from Daft. Do not scrape. events[] matches the exams-board API shape: eventDate, type (EXAM, QUIZ, EVENT, VACATION), title. A bare list of events is also accepted.",
-  "events": [
-    {
-      "eventDate": "2026-11-18",
-      "type": "QUIZ",
-      "title": "גאוגרפיה — אקלים ישראל"
-    },
-    {
-      "eventDate": "2026-11-26",
-      "type": "QUIZ",
-      "title": "אנגלית — Unseen + Vocabulary, Unit 3"
-    },
-    {
-      "eventDate": "2026-11-30",
-      "type": "EXAM",
-      "title": "היסטוריה — מלחמת העולם הראשונה"
-    },
-    {
-      "eventDate": "2026-12-03",
-      "type": "EXAM",
-      "title": "מתמטיקה — משוואות ומערכות משוואות"
-    },
-    {
-      "eventDate": "2026-12-07",
-      "type": "EVENT",
-      "title": "סיור במוזיאון (נרשמים עד יום רביעי)"
-    },
-    {
-      "eventDate": "2026-12-08",
-      "type": "EXAM",
-      "title": "עברית — הבעה בכתב ותחביר"
-    },
-    {
-      "eventDate": "2026-12-14",
-      "type": "EXAM",
-      "title": "מדעים — תא ומערכות בגוף האדם"
-    },
-    {
-      "eventDate": "2026-12-16",
-      "type": "EVENT",
-      "title": "מעבדה במדעים (השלמה למבחן)"
-    },
-    {
-      "eventDate": "2026-12-24",
-      "type": "VACATION",
-      "title": "חופשת חנוכה (תחילה)"
-    }
-  ]
-}
+[
+  {
+    "eventDate": "2026-11-26",
+    "type": "EVENT",
+    "title": "רב תרבותי- סיור בפלמחים"
+  },
+  {
+    "eventDate": "2026-12-01",
+    "type": "EXAM",
+    "title": "ביולגיה"
+  },
+  {
+    "eventDate": "2026-12-03",
+    "type": "EXAM",
+    "title": "עברית"
+  },
+  {
+    "eventDate": "2026-12-13",
+    "type": "EVENT",
+    "title": "רופא שיניים"
+  },
+  {
+    "eventDate": "2026-12-14",
+    "type": "QUIZ",
+    "title": "מתמטיקה"
+  },
+  {
+    "eventDate": "2026-12-17",
+    "type": "EXAM",
+    "title": "פיזיקה"
+  },
+  {
+    "eventDate": "2026-12-21",
+    "type": "EXAM",
+    "title": "אנגלית"
+  },
+  {
+    "eventDate": "2026-12-28",
+    "type": "QUIZ",
+    "title": "מתמטיקה"
+  },
+  {
+    "eventDate": "2026-12-31",
+    "type": "EVENT",
+    "title": "רב תרבותי- סיור לרמלה"
+  },
+  {
+    "eventDate": "2027-01-05",
+    "type": "EXAM",
+    "title": "ערבית"
+  },
+  {
+    "eventDate": "2027-03-17",
+    "type": "EVENT",
+    "title": "טיול מסלול רב תרבותי"
+  },
+  {
+    "eventDate": "2027-03-18",
+    "type": "EVENT",
+    "title": "טיול מסלול רב תרבותי"
+  }
+]
