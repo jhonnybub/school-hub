@@ -1,6 +1,6 @@
 {
-  "name": "מרכז המידע של ט׳3",
-  "short_name": "ט׳3",
+  "name": "SchoolHub",
+  "short_name": "SchoolHub",
   "description": "מערכת שעות, מבחנים ועלון שבועי לכיתה ט׳3",
   "dir": "rtl",
   "lang": "he",

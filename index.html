@@ -7,9 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ט׳3">
+  <meta name="apple-mobile-web-app-title" content="SchoolHub">
+  <meta name="application-name" content="SchoolHub">
   <meta name="description" content="מרכז המידע של כיתה ט׳3 — מערכת שעות, מבחנים ועלון שבועי">
-  <title>מרכז המידע של ט׳3</title>
+  <title>SchoolHub</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -341,11 +342,13 @@
       color: var(--black);
       cursor: pointer;
     }
+    .brand { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: var(--black); text-align: right; }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="app-header">
+      <p class="brand" dir="ltr">SchoolHub</p>
       <h1 class="greeting" id="greeting"></h1>
       <p class="date" id="date-line"></p>
       <p class="example-banner" id="example-banner" hidden>מוצגים נתוני דוגמה — יוחלפו כש-Daft יעביר את המידע האמיתי.</p>
