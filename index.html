@@ -91,26 +91,35 @@
     }
 
     .text-nav {
-      display: none;
-      gap: 16px;
-      margin: -8px 0 20px;
-      padding: 0 0 12px;
+      display: flex;
+      gap: 20px;
+      margin: -4px -24px 20px;
+      padding: 0 24px;
       border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
-    .text-nav.visible { display: flex; }
+    .text-nav::-webkit-scrollbar { display: none; }
     .text-nav button {
       appearance: none;
+      flex-shrink: 0;
       border: 0;
+      border-bottom: 2px solid transparent;
       background: none;
-      padding: 8px 0;
+      min-height: 44px;
+      padding: 10px 0 8px;
+      margin-bottom: -1px;
       font-family: inherit;
-      font-size: 13px;
+      font-size: 17px;
       font-weight: 600;
       color: var(--muted);
       cursor: pointer;
       line-height: 1.3;
+      white-space: nowrap;
     }
-    .text-nav button[aria-selected="true"] { color: var(--black); }
+    .text-nav button[aria-selected="true"] { color: var(--black); border-bottom-color: var(--black); }
 
     .screen { display: none; }
     .screen.active { display: block; }
@@ -350,14 +359,9 @@
       color: var(--muted); cursor: pointer; line-height: 0;
     }
     .gear[aria-pressed="true"] { color: var(--black); }
-    .about-head { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
-    .about-icon { width: 48px; height: 48px; border-radius: 11px; border: 1px solid var(--line); flex-shrink: 0; }
-    .about-name { font-size: 17px; font-weight: 700; letter-spacing: 0.02em; text-align: right; margin: 0 0 2px; }
-    .about-desc { margin: 0; font-size: 14px; }
-    .about-by { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
-    .about-list { list-style: none; margin: 0 0 12px; padding: 0; }
-    .about-list li { font-size: 15px; color: var(--black); line-height: 1.45; padding: 6px 0; border-bottom: 1px solid var(--line); }
-    .about-list li:last-child { border-bottom: 0; }
+    .credit { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+    .credit-icon { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); flex-shrink: 0; }
+    .credit-text { font-size: 15px; font-weight: 600; color: var(--black); }
     .about-info { font-size: 13px; }
     .settings-text { font-size: 15px; color: var(--muted); line-height: 1.45; margin-bottom: 8px; }
     #screen-settings .push-area { margin-top: 4px; }
@@ -453,10 +457,10 @@
     </header>
 
     <nav class="text-nav" id="text-nav" aria-label="מסכים">
-      <button type="button" data-target="home">ראשי</button>
+      <button type="button" data-target="home">מסך הבית</button>
       <button type="button" data-target="schedule">מערכת</button>
-      <button type="button" data-target="exams">מבחנים</button>
       <button type="button" data-target="week">שבועית</button>
+      <button type="button" data-target="exams">מבחנים</button>
       <button type="button" data-target="newsletter">עלון</button>
     </nav>
 
@@ -479,24 +483,16 @@
           <h2 class="section-title">הוספה למסך הבית</h2>
           <p class="settings-text">פתחו ב-Safari ← לחצו על שיתוף ← הוספה למסך הבית. התראות עובדות רק מהאייקון במסך הבית.</p>
         </section>
+        <section class="section" aria-label="מידע">
+          <h2 class="section-title">מידע</h2>
+          <p class="settings-text about-info" id="settings-info"></p>
+        </section>
         <section class="section" aria-label="אודות">
           <h2 class="section-title">אודות</h2>
-          <div class="about-head">
-            <img class="about-icon" src="icon-192.png?v=2" alt="" width="48" height="48">
-            <div>
-              <p class="about-name" dir="ltr">SchoolHub</p>
-              <p class="settings-text about-desc">המערכת, המבחנים והעלון של כיתה ט׳3 בבית הספר יגאל אלון.</p>
-            </div>
+          <div class="credit">
+            <img class="credit-icon" src="icon-192.png?v=2" alt="" width="32" height="32">
+            <p class="credit-text">נבנה ע״י יהונתן בובליל</p>
           </div>
-          <p class="about-by">נבנה על ידי ג׳וני</p>
-          <ul class="about-list">
-            <li>מערכת יומית עם ✓ לשיעורים שהסתיימו</li>
-            <li>מערכת שבועית</li>
-            <li>מבחנים ואירועים</li>
-            <li>עלון שבועי</li>
-            <li>התראה בסוף כל שיעור והתראה על שינויים במערכת</li>
-          </ul>
-          <p class="settings-text about-info" id="settings-info"></p>
         </section>
       </section>
     </main>
@@ -1337,7 +1333,8 @@
       el.classList.toggle("active", el.dataset.screen === target);
     });
     const nav = document.getElementById("text-nav");
-    nav.classList.toggle("visible", target !== "home");
+    const sel = nav.querySelector(`button[data-target="${target}"]`);
+    if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: "nearest", inline: "nearest" });
     nav.querySelectorAll("button").forEach((btn) => {
       btn.setAttribute("aria-selected", btn.dataset.target === target ? "true" : "false");
     });
