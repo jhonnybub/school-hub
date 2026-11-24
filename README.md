@@ -23,3 +23,9 @@
 אחרי שמעלים, שולחים לג'וני את הקישור. אין צורך ב-Streamlit או ב-Mac פתוח.
 
 קבצים עיקריים: `index.html`, `manifest.json`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `data/`.
+
+## Day over + push notifications
+- After today's last non-cancelled lesson ends (Asia/Jerusalem), today's list turns gray and shows «נגמר!» (home + schedule). Re-checked every minute.
+- `sw.js`: push + notificationclick only, no fetch handler (data always from network). Data is fetched with `cache: "no-cache"`.
+- «הפעל התראות» at the bottom of home subscribes with the VAPID public key and shows the subscription JSON to copy to Paul.
+- Sender lives on the box: /workspace/school_hub_push/send_lesson_push.py (private key is NOT in this repo).

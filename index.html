@@ -276,6 +276,71 @@
       white-space: pre-wrap;
       margin: 0;
     }
+
+    .day-over {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--black);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      margin: 4px 0 8px;
+    }
+    .row.over .subject,
+    .row.over .room,
+    .row.over .time,
+    .row.over .done-mark,
+    .row.over .flag {
+      color: var(--cancelled);
+    }
+
+    .push-area { margin-top: 24px; }
+    .push-area[hidden] { display: none; }
+    .push-link {
+      appearance: none;
+      border: 0;
+      background: none;
+      padding: 0;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--black);
+      cursor: pointer;
+    }
+    .push-note {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: 8px;
+    }
+    .push-code {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      min-height: 96px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 11px;
+      color: var(--black);
+      background: #FAFAFA;
+      direction: ltr;
+      text-align: left;
+      resize: vertical;
+    }
+    .push-copy {
+      appearance: none;
+      margin-top: 8px;
+      padding: 6px 14px;
+      border: 1px solid var(--black);
+      border-radius: 4px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--black);
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -299,6 +364,11 @@
       <section class="screen" id="screen-exams" data-screen="exams"></section>
       <section class="screen" id="screen-newsletter" data-screen="newsletter"></section>
     </main>
+
+    <div class="push-area" id="push-area" hidden>
+      <button type="button" class="push-link" id="push-link">הפעל התראות</button>
+      <div id="push-panel"></div>
+    </div>
   </div>
 
   <script>
@@ -623,9 +693,9 @@
 
   async function loadFromFiles() {
     const [s, e, n] = await Promise.all([
-      fetch("data/schedule.json"),
-      fetch("data/exams.json"),
-      fetch("data/newsletter.json"),
+      fetch("data/schedule.json", { cache: "no-cache" }),
+      fetch("data/exams.json", { cache: "no-cache" }),
+      fetch("data/newsletter.json", { cache: "no-cache" }),
     ]);
     if (!s.ok || !e.ok || !n.ok) throw new Error("data files unavailable");
     return {
@@ -701,6 +771,20 @@
     return nowIsrael().minutes >= end;
   }
 
+  // Day over: today's last non-cancelled lesson has ended (Asia/Jerusalem).
+  function isDayOver(day, dayIso) {
+    if (!day || !dayIso || dayIso !== todayIsrael()) return false;
+    const ends = (day.lessons || [])
+      .map((lesson, i) => fillLessonTimes(lesson, Number(lesson && lesson.num) ? Number(lesson.num) - 1 : i))
+      .filter((lesson) => lessonFlag(lesson) !== "בוטל")
+      .map((lesson) => parseTimeMinutes(lesson.end))
+      .filter((m) => m != null);
+    if (!ends.length) return false;
+    return nowIsrael().minutes >= Math.max(...ends);
+  }
+
+  const DAY_OVER_HTML = `<p class="day-over">נגמר!</p>`;
+
   function formatRoom(room) {
     const r = String(room || "").trim();
     if (!r) return "";
@@ -775,7 +859,7 @@
       .slice(0, limit);
   }
 
-  function lessonRow(lesson, dayIso) {
+  function lessonRow(lesson, dayIso, over = false) {
     const filled = fillLessonTimes(lesson, Number(lesson && lesson.num) ? Number(lesson.num) - 1 : 0);
     const flag = lessonFlag(filled);
     const cancelled = flag === "בוטל";
@@ -785,7 +869,7 @@
     const checkHtml = done ? `<span class="done-mark" aria-label="השיעור הסתיים">✓</span>` : "";
     const room = formatRoom(filled.room);
     const time = escapeHtml(formatLessonTime(filled));
-    return `<div class="row${cancelled ? " cancelled" : ""}${done ? " done" : ""}">
+    return `<div class="row${cancelled ? " cancelled" : ""}${done ? " done" : ""}${over ? " over" : ""}">
       <div class="row-start">
         <div class="row-top"><span class="subject">${subject}</span>${checkHtml}${flagHtml}</div>
         ${room ? `<div class="room">${escapeHtml(room)}</div>` : ""}
@@ -827,7 +911,9 @@
       } else {
         parts.push(`<p class="info">אין לימודים מחר (${escapeHtml(formatLongDate(tomorrow))}). מוצגת המערכת של ${escapeHtml(formatLongDate(picked.date))}.</p>`);
       }
-      parts.push((picked.day.lessons || []).map((lesson) => lessonRow(lesson, picked.date)).join(""));
+      const over = isDayOver(picked.day, picked.date);
+      if (over) parts.push(DAY_OVER_HTML);
+      parts.push((picked.day.lessons || []).map((lesson) => lessonRow(lesson, picked.date, over)).join(""));
     } else if (schedule) {
       parts.push(`<p class="info">המערכת למחר עוד לא עודכנה.</p>`);
     } else {
@@ -863,8 +949,9 @@
       const iso = (parseISODate(day.date) || {}).iso;
       const isToday = iso === today;
       const lessons = day.lessons || [];
+      const over = isToday && isDayOver(day, iso);
       const rows = lessons.length
-        ? lessons.map((lesson) => lessonRow(lesson, iso)).join("")
+        ? (over ? DAY_OVER_HTML : "") + lessons.map((lesson) => lessonRow(lesson, iso, over)).join("")
         : `<p class="empty">אין שיעורים ביום זה.</p>`;
       let title;
       if (iso) title = `${isToday ? "היום · " : ""}${formatLongDate(iso)}`;
@@ -977,6 +1064,8 @@
       btn.setAttribute("aria-selected", btn.dataset.target === target ? "true" : "false");
     });
     updateHeader(target);
+    const pushArea = document.getElementById("push-area");
+    if (pushArea) pushArea.hidden = target !== "home";
     if (location.hash.replace("#", "") !== target) {
       history.replaceState(null, "", `#${target}`);
     }
@@ -1032,6 +1121,96 @@
     });
   }
 
+  // ---- Push notifications (iOS 16.4+ home-screen web push) ----
+  const VAPID_PUBLIC_KEY = "BABkEtqk9nK9Eb0l-1mkobx2Zp1Oe5BZr_WjYi3v4r6jwxac0JCu0hKQz4F5NMAA-QY_bG8l3Lm7Hwy9ca3BzQo";
+
+  function isIOS() {
+    const ua = navigator.userAgent || "";
+    return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  }
+
+  function isStandalone() {
+    return window.navigator.standalone === true ||
+      (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+  }
+
+  function urlB64ToUint8Array(base64) {
+    const padding = "=".repeat((4 - (base64.length % 4)) % 4);
+    const b64 = (base64 + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const raw = atob(b64);
+    return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+  }
+
+  function pushNote(text) {
+    document.getElementById("push-panel").innerHTML = `<p class="push-note">${escapeHtml(text)}</p>`;
+  }
+
+  function showSubscription(sub) {
+    const json = JSON.stringify(sub);
+    const panel = document.getElementById("push-panel");
+    panel.innerHTML = `<p class="push-note">ההתראות מופעלות. שלח את זה לפול:</p>
+      <textarea class="push-code" id="push-code" readonly>${escapeHtml(json)}</textarea>
+      <button type="button" class="push-copy" id="push-copy">העתק</button>`;
+    document.getElementById("push-copy").addEventListener("click", async () => {
+      const btn = document.getElementById("push-copy");
+      const box = document.getElementById("push-code");
+      try {
+        await navigator.clipboard.writeText(json);
+      } catch {
+        box.focus();
+        box.select();
+        try { document.execCommand("copy"); } catch {}
+      }
+      btn.textContent = "הועתק ✓";
+      setTimeout(() => { btn.textContent = "העתק"; }, 2000);
+    });
+  }
+
+  async function enablePush() {
+    if (isIOS() && !isStandalone()) {
+      pushNote("כדי לקבל התראות צריך לפתוח את האפליקציה מהאייקון במסך הבית, לא מ-Safari.");
+      return;
+    }
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+      pushNote("המכשיר הזה לא תומך בהתראות. באייפון צריך iOS 16.4 ומעלה, ולפתוח מהאייקון במסך הבית.");
+      return;
+    }
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        pushNote("ההתראות חסומות. אפשר להפעיל אותן בהגדרות ← התראות ← ט׳3.");
+        return;
+      }
+      const reg = await navigator.serviceWorker.register("sw.js", { scope: "./" });
+      await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY),
+        });
+      }
+      showSubscription(sub);
+    } catch (err) {
+      pushNote("משהו השתבש בהפעלת ההתראות. נסה שוב בעוד רגע.");
+      console.error(err);
+    }
+  }
+
+  function setupPush() {
+    const link = document.getElementById("push-link");
+    link.addEventListener("click", enablePush);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js", { scope: "./" }).then(async (reg) => {
+        if (!("PushManager" in window) || !("Notification" in window)) return;
+        if (Notification.permission !== "granted") return;
+        const sub = await reg.pushManager.getSubscription();
+        if (sub) link.textContent = "התראות מופעלות · הצג קוד";
+      }).catch((err) => console.error(err));
+    }
+  }
+
+  setupPush();
   loadData().then(boot);
   </script>
 </body>
