@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>וידג׳ט SchoolHub</title>
+  <style>
+    @font-face {
+      font-family: "Assistant";
+      src: url("../fonts/Assistant-VariableFont_wght.ttf") format("truetype");
+      font-weight: 100 800;
+      font-style: normal;
+      font-display: swap;
+    }
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --red: #E10600;
+      --muted: #6B6B6B;
+      --line: #EEEEEE;
+      --font: "Assistant", sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      background: var(--white);
+      color: var(--black);
+      font-family: var(--font);
+      font-weight: 400;
+      font-size: 17px;
+      line-height: 1.4;
+      min-height: 100%;
+      direction: rtl;
+      text-align: right;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    main {
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 28px 24px 48px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      line-height: 1.15;
+    }
+    .lead {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    ol {
+      margin: 24px 0 0;
+      padding: 0 20px 0 0;
+    }
+    li {
+      margin: 0 0 16px;
+      padding-right: 4px;
+    }
+    li strong { font-weight: 700; }
+    button.copy {
+      appearance: none;
+      display: block;
+      width: 100%;
+      margin-top: 24px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--black);
+      color: var(--white);
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 700;
+      min-height: 48px;
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+    button.copy.done { background: var(--red); }
+    button.copy:disabled { opacity: 0.6; cursor: default; }
+    .note {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .err {
+      margin-top: 12px;
+      color: var(--red);
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>וידג׳ט SchoolHub</h1>
+    <p class="lead">מערכת השעות על מסך הבית, דרך האפליקציה החינמית Scriptable.</p>
+
+    <ol>
+      <li>התקינו את <strong>Scriptable</strong> מ־App Store, אם היא עוד לא אצלכם.</li>
+      <li>לחצו על <strong>העתק קוד</strong> למטה. פתחו את Scriptable, לחצו על <strong>+</strong>, הדביקו, ושמרו בשם <strong>SchoolHub</strong>.</li>
+      <li>לחיצה ארוכה על מסך הבית, <strong>הוספת וידג׳ט</strong>, בחרו Scriptable (מומלץ קטן או בינוני). אחר כך <strong>Edit Widget</strong>: Script — SchoolHub, When Interacting — Run Script.</li>
+    </ol>
+
+    <button type="button" class="copy" id="copy">העתק קוד</button>
+    <p class="err" id="err"></p>
+    <p class="note">לחיצה על הווידג׳ט פותחת את SchoolHub. הוא מתעדכן לבד לפי השעה, בדרך כלל כל 15 עד 30 דקות.</p>
+  </main>
+  <script>
+    const btn = document.getElementById("copy");
+    const err = document.getElementById("err");
+    const SCRIPT_URL = "SchoolHub.js?t=" + Date.now();
+
+    async function copyCode() {
+      err.style.display = "none";
+      btn.disabled = true;
+      try {
+        const res = await fetch(SCRIPT_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error("fetch failed");
+        const text = await res.text();
+        if (!text || text.length < 100) throw new Error("empty");
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "הועתק ✓";
+        btn.classList.add("done");
+        setTimeout(() => {
+          btn.textContent = "העתק קוד";
+          btn.classList.remove("done");
+          btn.disabled = false;
+        }, 2500);
+      } catch (e) {
+        btn.disabled = false;
+        err.style.display = "block";
+        err.textContent = "לא הצלחתי להעתיק. פתחו את הקובץ SchoolHub.js, סמנו את הכל והעתיקו ידנית.";
+      }
+    }
+    btn.addEventListener("click", copyCode);
+  </script>
+</body>
+</html>
