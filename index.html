@@ -343,13 +343,101 @@
       color: var(--black);
       cursor: pointer;
     }
+    .brand-row { display: flex; align-items: center; justify-content: space-between; margin: 0 0 6px; }
+    .brand-row .brand { margin: 0; }
+    .gear {
+      appearance: none; border: 0; background: none; padding: 10px; margin: -10px;
+      color: var(--muted); cursor: pointer; line-height: 0;
+    }
+    .gear[aria-pressed="true"] { color: var(--black); }
+    .settings-text { font-size: 15px; color: var(--muted); line-height: 1.45; margin-bottom: 8px; }
+    #screen-settings .push-area { margin-top: 4px; }
     .brand { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: var(--black); text-align: right; }
+
+    /* ---- Weekly timetable (מערכת שבועית) ---- */
+    .week-days {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 16px;
+    }
+    .week-day {
+      appearance: none;
+      flex: 1;
+      position: relative;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--black);
+      cursor: pointer;
+    }
+    .week-day[aria-selected="true"] { background: var(--black); border-color: var(--black); color: var(--white); }
+    .week-day.today::after {
+      content: "";
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      width: 4px;
+      height: 4px;
+      margin-left: -2px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+    .week-title { display: flex; align-items: baseline; gap: 8px; }
+    .today-tag {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--red);
+      line-height: 1.2;
+    }
+    .wrow {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .wrow:last-child { border-bottom: 0; }
+    .wnum {
+      flex-shrink: 0;
+      width: 22px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.4;
+      text-align: center;
+    }
+    .wbody { flex: 1; min-width: 0; }
+    .wgroup + .wgroup { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line); }
+    .wgroup .subject { font-size: 16px; }
+    .wmeta { font-size: 13px; color: var(--muted); line-height: 1.3; margin-top: 1px; }
+    .wside { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+    .wside .time { font-size: 14px; }
+    .split-tag {
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 5px;
+      line-height: 1.5;
+    }
+    .wrow.over .subject, .wrow.over .wmeta, .wrow.over .time, .wrow.over .wnum { color: var(--cancelled); }
+    .week-note { font-size: 13px; color: var(--muted); line-height: 1.45; margin-top: 16px; }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="app-header">
-      <p class="brand" dir="ltr">SchoolHub</p>
+      <div class="brand-row">
+        <p class="brand" dir="ltr">SchoolHub</p>
+        <button type="button" class="gear" id="gear" data-target="settings" aria-label="הגדרות">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
       <h1 class="greeting" id="greeting"></h1>
       <p class="date" id="date-line"></p>
       <p class="example-banner" id="example-banner" hidden>מוצגים נתוני דוגמה — יוחלפו כש-Daft יעביר את המידע האמיתי.</p>
@@ -359,6 +447,7 @@
       <button type="button" data-target="home">ראשי</button>
       <button type="button" data-target="schedule">מערכת</button>
       <button type="button" data-target="exams">מבחנים</button>
+      <button type="button" data-target="week">שבועית</button>
       <button type="button" data-target="newsletter">עלון</button>
     </nav>
 
@@ -366,13 +455,27 @@
       <section class="screen active" id="screen-home" data-screen="home"></section>
       <section class="screen" id="screen-schedule" data-screen="schedule"></section>
       <section class="screen" id="screen-exams" data-screen="exams"></section>
+      <section class="screen" id="screen-week" data-screen="week"></section>
       <section class="screen" id="screen-newsletter" data-screen="newsletter"></section>
+      <section class="screen" id="screen-settings" data-screen="settings">
+        <section class="section" aria-label="התראות">
+          <h2 class="section-title">התראות</h2>
+          <p class="settings-text">התראה בסוף כל שיעור עם השיעור הבא, והתראה כשהמערכת משתנה.</p>
+          <div class="push-area" id="push-area">
+            <button type="button" class="push-link" id="push-link">הפעל התראות</button>
+            <div id="push-panel"></div>
+          </div>
+        </section>
+        <section class="section" aria-label="מסך הבית">
+          <h2 class="section-title">הוספה למסך הבית</h2>
+          <p class="settings-text">פתחו ב-Safari ← לחצו על שיתוף ← הוספה למסך הבית. התראות עובדות רק מהאייקון במסך הבית.</p>
+        </section>
+        <section class="section" aria-label="מידע">
+          <h2 class="section-title">מידע</h2>
+          <p class="settings-text" id="settings-info"></p>
+        </section>
+      </section>
     </main>
-
-    <div class="push-area" id="push-area" hidden>
-      <button type="button" class="push-link" id="push-link">הפעל התראות</button>
-      <div id="push-panel"></div>
-    </div>
   </div>
 
   <script>
@@ -530,7 +633,8 @@
   const HE_MONTHS = ["בינואר", "בפברואר", "במרץ", "באפריל", "במאי", "ביוני", "ביולי", "באוגוסט", "בספטמבר", "באוקטובר", "בנובמבר", "בדצמבר"];
   const TYPE_LABELS = { EXAM: "מבחן", QUIZ: "בוחן", EVENT: "אירוע", VACATION: "חופשה" };
   const EXAM_TYPES = new Set(["EXAM", "QUIZ"]);
-  const SCREENS = ["home", "schedule", "exams", "newsletter"];
+  const SCREENS = ["home", "schedule", "week", "exams", "newsletter", "settings"];
+  const APP_VERSION = "2026.11.24 · v3";
   const CLASS_NAME = "ט׳3";
 
   // Built-in bell schedule. Daft's data often has start/end = null; we fill
@@ -935,8 +1039,7 @@
       parts.push(`<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`);
     }
     parts.push(`</section>`);
-    parts.push(`<button type="button" class="more-link" data-target="newsletter">עלון שבועי</button>`);
-    parts.push(`<p class="install-hint">כדי לשמור במסך הבית באייפון: פתחו ב-Safari ← לחצו על שיתוף ← הוספה למסך הבית.</p>`);
+    parts.push(`<button type="button" class="more-link" data-target="week">מערכת שבועית</button> <span class="more-link" aria-hidden="true" style="color:var(--muted);font-weight:400">·</span> <button type="button" class="more-link" data-target="newsletter">עלון שבועי</button>`);
     root.innerHTML = parts.join("");
     root.querySelectorAll("[data-target]").forEach((btn) => {
       btn.addEventListener("click", () => showScreen(btn.dataset.target));
@@ -1046,6 +1149,153 @@
     root.innerHTML = parts.join("");
   }
 
+
+  // ---- Weekly timetable (data/base_schedule.json, written by Daft) ----
+  // {class, days: {"א": {"1": "מקצוע (מורה, חדר) / מקצוע (מורה)", ...}, ..., "ו": {}}}
+  // Split groups are separated by " / ". Teachers: first names only.
+  const EMBEDDED_BASE = {
+ "class": "ט׳3",
+ "note": "Regular weekly timetable from Johnny's screenshot (Nov 24, 2026). Complete: lesson 7 on day ב is the latest lesson of the week; lesson 0 empty; no Friday lessons.",
+ "days": {
+  "א": {
+   "1": "פיזיקה (סבטלנה, מעבדה ב')",
+   "2": "ביולוגיה (רונית, ט'3)",
+   "3": "ספרות (רוחלה, ט'3)",
+   "4": "ספרות (רוחלה, ט'3)",
+   "5": "חינוך גופני (איתן, אולם) / חינוך גופני (בתיה, מגרש)",
+   "6": "חינוך (בתיה, ט'3) / תרבויות (אמיר, ט'3)"
+  },
+  "ב": {
+   "1": "אנגלית (אינה, הקבצת אנגלית) / אנגלית א (רונית, ט'3)",
+   "2": "אנגלית (אינה) / אנגלית א (רונית)",
+   "3": "ערבית (יובל, ט'3)",
+   "4": "מתמטיקה 4 יח' (חגית) / מתמטיקה 5 יח' (קרן, ט'3)",
+   "5": "עברית (תמי, ט'3)",
+   "6": "עברית (תמי, ט'3)",
+   "7": "מתמטיקה 5 יח' (קרן, ט'3)"
+  },
+  "ג": {
+   "1": "היסטוריה (לין, ט'3)",
+   "2": "ספרדית (אינה, ט'3) / פיזיולוגיה של המאמץ (בתיה)",
+   "3": "ביולוגיה (רונית, ט'3)",
+   "4": "מתמטיקה 4 יח' (חגית) / מתמטיקה 5 יח' (קרן, ט'3)",
+   "5": "מתמטיקה 4 יח' (חגית) / מתמטיקה 5 יח' (קרן, ט'3)"
+  },
+  "ד": {
+   "1": "ספרדית (אינה, ט'3) / פיזיולוגיה של המאמץ (בתיה)",
+   "2": "תנך (ורד, ט'3)",
+   "3": "מתמטיקה 4 יח' (חגית) / מתמטיקה 5 יח' (קרן, ט'3)",
+   "4": "אנגלית (אינה) / אנגלית א (רונית, ט'3)",
+   "5": "מתמטיקה 4 יח' (חגית) / מתמטיקה 5 יח' (קרן, ט'3)",
+   "6": "אנגלית (אינה) / אנגלית א (רונית, ט'3)"
+  },
+  "ה": {
+   "1": "ערבית (יובל, ט'3)",
+   "2": "עברית (תמי, ט'3)",
+   "3": "חינוך גופני (איתן, אולם) / חינוך גופני (בתיה, מגרש)",
+   "4": "היסטוריה (לין, ט'3)",
+   "5": "חינוך (בתיה, ט'3)",
+   "6": "מזרחנות-רב תרבות (יובל)"
+  },
+  "ו": {}
+ }
+};
+  const WEEK_DAYS = ["א", "ב", "ג", "ד", "ה"];  // Sunday..Thursday (no school on Friday)
+  const WEEK_DAY_NAMES = { "א": "ראשון", "ב": "שני", "ג": "שלישי", "ד": "רביעי", "ה": "חמישי" };
+  const weekState = { base: null, picked: null };
+
+  function heQuotes(v) {
+    return String(v ?? "").replace(/'/g, "׳").replace(/"/g, "״");
+  }
+
+  function parseWeekCell(cell) {
+    return String(cell || "").split(/\s+\/\s+/).map((part) => part.trim()).filter(Boolean).map((part) => {
+      const m = part.match(/^(.*?)\s*\((.*)\)\s*$/);
+      const subject = (m ? m[1] : part).trim();
+      const bits = m ? m[2].split(",").map((b) => b.trim()).filter(Boolean) : [];
+      return { subject: heQuotes(subject), teacher: bits[0] || "", room: heQuotes(bits.slice(1).join(", ")) };
+    });
+  }
+
+  function hebrewDayLetter(iso) {
+    const [y, mo, d] = iso.split("-").map(Number);
+    return ["א", "ב", "ג", "ד", "ה", "ו", "ש"][new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
+  }
+
+  async function loadBase() {
+    try {
+      const r = await fetch("data/base_schedule.json", { cache: "no-cache" });
+      if (!r.ok) throw new Error("no base");
+      return await r.json();
+    } catch {
+      return EMBEDDED_BASE;
+    }
+  }
+
+  function weekRow(num, cell, isToday) {
+    const groups = parseWeekCell(cell);
+    const bells = bellFor(num);
+    const time = bells ? `${bells.start}–${bells.end}` : "";
+    const over = isToday && bells && nowIsrael().minutes >= parseTimeMinutes(bells.end);
+    const body = groups.map((g) => {
+      const meta = [g.teacher, formatRoom(g.room)].filter(Boolean).join(" · ");
+      return `<div class="wgroup"><div class="row-top"><span class="subject">${escapeHtml(g.subject)}</span></div>${meta ? `<div class="wmeta">${escapeHtml(meta)}</div>` : ""}</div>`;
+    }).join("");
+    const split = groups.length > 1 ? `<span class="split-tag">${groups.length} קבוצות</span>` : "";
+    const check = over ? `<span class="done-mark" aria-label="השיעור הסתיים">✓</span>` : "";
+    return `<div class="wrow${over ? " over" : ""}">
+      <div class="wnum">${escapeHtml(num)}</div>
+      <div class="wbody">${body}</div>
+      <div class="wside">${time ? `<div class="time">${escapeHtml(time)}</div>` : ""}${check}${split}</div>
+    </div>`;
+  }
+
+  function renderWeek(root, today) {
+    const base = weekState.base;
+    const days = base && base.days;
+    if (!days) {
+      root.innerHTML = `<p class="empty">עדיין אין כאן נתונים. ברגע ש-Daft יעביר את המידע, הוא יופיע כאן.</p>`;
+      return;
+    }
+    const todayLetter = hebrewDayLetter(today);
+    const isSchoolDay = WEEK_DAYS.includes(todayLetter);
+    // Default: today; on Friday/Saturday show Sunday (next school day).
+    const sel = weekState.picked || (isSchoolDay ? todayLetter : "א");
+    const chips = WEEK_DAYS.map((k) => `<button type="button" class="week-day${k === todayLetter ? " today" : ""}" data-day="${k}" aria-selected="${k === sel}" aria-label="יום ${WEEK_DAY_NAMES[k]}">${k}׳</button>`).join("");
+    const lessons = Object.entries(days[sel] || {})
+      .filter(([, c]) => String(c || "").trim())
+      .sort((a, b) => Number(a[0]) - Number(b[0]));
+    const isToday = sel === todayLetter;
+    const rows = lessons.length
+      ? lessons.map(([n, c]) => weekRow(n, c, isToday)).join("")
+      : `<p class="empty">אין שיעורים ביום זה.</p>`;
+    const todayTag = isToday ? `<span class="today-tag">היום</span>` : "";
+    const last = lessons.length ? bellFor(lessons[lessons.length - 1][0]) : null;
+    const range = lessons.length && bellFor(lessons[0][0]) && last ? ` · ${bellFor(lessons[0][0]).start}–${last.end}` : "";
+    const fri = !isSchoolDay ? `<p class="info" style="margin-bottom:12px">היום אין לימודים. מוצג יום ראשון.</p>` : "";
+    root.innerHTML = `${fri}<div class="week-days" role="tablist" aria-label="ימי השבוע">${chips}</div>
+      <section class="section"><h2 class="section-title week-title">יום ${WEEK_DAY_NAMES[sel]}${todayTag}<span class="wmeta" style="margin:0;font-weight:400"><bdi dir="ltr">${escapeHtml(range.replace(" · ", ""))}</bdi></span></h2>${rows}</section>
+      <p class="week-note">המערכת הקבועה של ${escapeHtml(formatClass(base.class))}. שינויים ליום מסוים מופיעים במסך ״מערכת״. בשישי אין לימודים.</p>`;
+    root.querySelectorAll(".week-day").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        weekState.picked = btn.dataset.day;
+        renderWeek(root, today);
+      });
+    });
+  }
+
+  function renderSettingsInfo() {
+    const el = document.getElementById("settings-info");
+    if (!el) return;
+    const days = (state.schedule && state.schedule.days || []).map((d) => (parseISODate(d.date) || {}).iso).filter(Boolean).sort();
+    const lines = [
+      `גרסה: <bdi dir="ltr">${escapeHtml(APP_VERSION)}</bdi>`,
+      escapeHtml(days.length ? `מערכת יומית עודכנה עד: ${formatLongDate(days[days.length - 1])}` : "מערכת יומית: עוד לא התקבלה"),
+      `מקור הנתונים: <bdi dir="ltr">Daft</bdi>${state.isExample ? " (נתוני דוגמה)" : ""}`,
+    ];
+    el.innerHTML = lines.join("<br>");
+  }
+
   function updateHeader(screen) {
     document.getElementById("greeting").textContent = greetingNow();
     const dateEl = document.getElementById("date-line");
@@ -1068,8 +1318,8 @@
       btn.setAttribute("aria-selected", btn.dataset.target === target ? "true" : "false");
     });
     updateHeader(target);
-    const pushArea = document.getElementById("push-area");
-    if (pushArea) pushArea.hidden = target !== "home";
+    const gear = document.getElementById("gear");
+    if (gear) gear.setAttribute("aria-pressed", target === "settings" ? "true" : "false");
     if (location.hash.replace("#", "") !== target) {
       history.replaceState(null, "", `#${target}`);
     }
@@ -1090,11 +1340,13 @@
     state.className = className;
 
     const banner = document.getElementById("example-banner");
-    banner.hidden = !state.isExample;
+    banner.hidden = true; // example-data note lives in הגדרות → מידע
     renderHome(document.getElementById("screen-home"), schedule, exams, today);
     renderSchedule(document.getElementById("screen-schedule"), schedule, today);
+    renderWeek(document.getElementById("screen-week"), today);
     renderExams(document.getElementById("screen-exams"), exams, today);
     renderNewsletter(document.getElementById("screen-newsletter"), newsletter);
+    renderSettingsInfo();
     const current = location.hash.replace("#", "");
     const screen = SCREENS.includes(current) ? current : "home";
     if (document.getElementById("greeting").textContent) updateHeader(screen);
@@ -1112,6 +1364,7 @@
 
     renderAll();
 
+    document.getElementById("gear").addEventListener("click", () => showScreen("settings"));
     document.getElementById("text-nav").querySelectorAll("button").forEach((btn) => {
       btn.addEventListener("click", () => showScreen(btn.dataset.target));
     });
@@ -1182,7 +1435,7 @@
     try {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
-        pushNote("ההתראות חסומות. אפשר להפעיל אותן בהגדרות ← התראות ← ט׳3.");
+        pushNote("ההתראות חסומות. אפשר להפעיל אותן בהגדרות של האייפון ← התראות ← SchoolHub.");
         return;
       }
       const reg = await navigator.serviceWorker.register("sw.js", { scope: "./" });
@@ -1215,7 +1468,10 @@
   }
 
   setupPush();
-  loadData().then(boot);
+  Promise.all([loadData(), loadBase()]).then(([raw, base]) => {
+    weekState.base = base;
+    boot(raw);
+  });
   </script>
 </body>
 </html>
