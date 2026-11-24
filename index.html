@@ -350,6 +350,15 @@
       color: var(--muted); cursor: pointer; line-height: 0;
     }
     .gear[aria-pressed="true"] { color: var(--black); }
+    .about-head { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
+    .about-icon { width: 48px; height: 48px; border-radius: 11px; border: 1px solid var(--line); flex-shrink: 0; }
+    .about-name { font-size: 17px; font-weight: 700; letter-spacing: 0.02em; text-align: right; margin: 0 0 2px; }
+    .about-desc { margin: 0; font-size: 14px; }
+    .about-by { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
+    .about-list { list-style: none; margin: 0 0 12px; padding: 0; }
+    .about-list li { font-size: 15px; color: var(--black); line-height: 1.45; padding: 6px 0; border-bottom: 1px solid var(--line); }
+    .about-list li:last-child { border-bottom: 0; }
+    .about-info { font-size: 13px; }
     .settings-text { font-size: 15px; color: var(--muted); line-height: 1.45; margin-bottom: 8px; }
     #screen-settings .push-area { margin-top: 4px; }
     .brand { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: var(--black); text-align: right; }
@@ -470,9 +479,24 @@
           <h2 class="section-title">הוספה למסך הבית</h2>
           <p class="settings-text">פתחו ב-Safari ← לחצו על שיתוף ← הוספה למסך הבית. התראות עובדות רק מהאייקון במסך הבית.</p>
         </section>
-        <section class="section" aria-label="מידע">
-          <h2 class="section-title">מידע</h2>
-          <p class="settings-text" id="settings-info"></p>
+        <section class="section" aria-label="אודות">
+          <h2 class="section-title">אודות</h2>
+          <div class="about-head">
+            <img class="about-icon" src="icon-192.png?v=2" alt="" width="48" height="48">
+            <div>
+              <p class="about-name" dir="ltr">SchoolHub</p>
+              <p class="settings-text about-desc">המערכת, המבחנים והעלון של כיתה ט׳3 בבית הספר יגאל אלון.</p>
+            </div>
+          </div>
+          <p class="about-by">נבנה על ידי ג׳וני</p>
+          <ul class="about-list">
+            <li>מערכת יומית עם ✓ לשיעורים שהסתיימו</li>
+            <li>מערכת שבועית</li>
+            <li>מבחנים ואירועים</li>
+            <li>עלון שבועי</li>
+            <li>התראה בסוף כל שיעור והתראה על שינויים במערכת</li>
+          </ul>
+          <p class="settings-text about-info" id="settings-info"></p>
         </section>
       </section>
     </main>
