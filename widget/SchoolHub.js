@@ -11,12 +11,15 @@
 const SITE_URL = "https://jhonnybub.github.io/school-hub/";
 const SCHEDULE_URL = SITE_URL + "data/schedule.json";
 const BASE_URL = SITE_URL + "data/base_schedule.json";
+const EXAMS_URL = SITE_URL + "data/exams.json";
 const CACHE_NAME = "schoolhub-widget-cache.json";
 const TZ = "Asia/Jerusalem";
 const CLASS_NAME = "ט׳3";
 
 const WEEKDAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 const HE_LETTERS = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
+const EXAM_TYPES = { EXAM: true, QUIZ: true };
+const TYPE_LABELS = { EXAM: "מבחן", QUIZ: "בוחן", EVENT: "אירוע", VACATION: "חופשה" };
 
 // Built-in bell schedule. Daft's data often has start/end = null; fill by 1-based period.
 const BELL_SCHEDULE = {
@@ -36,12 +39,10 @@ const COLOR = {
   bgDark: "#000000",
   textLight: "#000000",
   textDark: "#FFFFFF",
-  mutedLight: "#6B6B6B",
-  mutedDark: "#A3A3A3",
-  cancelledLight: "#9A9A9A",
-  cancelledDark: "#7A7A7A",
+  secondaryLight: "#6B6B6B",
+  secondaryDark: "#8E8E93",
   lineLight: "#EEEEEE",
-  lineDark: "#2A2A2A",
+  lineDark: "#2C2C2E",
   red: "#E10600",
 };
 
@@ -129,20 +130,11 @@ function parseTimeMinutes(value) {
   return h * 60 + min;
 }
 
-function minutesToHHMM(mins) {
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
-
 function dateAtMinutes(iso, minutes, fromDate) {
   const [y, mo, d] = iso.split("-").map(Number);
-  // Build a Date in Asia/Jerusalem for iso + HH:MM.
-  // Use the offset of fromDate (or a noon probe) so DST is correct.
   const probe = fromDate instanceof Date ? fromDate : new Date(`${iso}T12:00:00`);
   const clock = nowIsrael(probe);
   const utcMs = probe.getTime() + (minutes - clock.minutes) * 60 * 1000;
-  // Adjust the calendar date if the probe isn't the same iso (rare).
   const probeIso = clock.date;
   const dayDelta = Math.round(
     (Date.UTC(y, mo - 1, d) - (() => {
@@ -186,7 +178,6 @@ function formatRoom(room) {
 function firstName(teacher) {
   const t = heQuotes(String(teacher || "").trim());
   if (!t) return "";
-  // Already first names in the data ("לין", "קרן"). Drop any leftover last name.
   return t.split(/\s+/)[0];
 }
 
@@ -236,7 +227,72 @@ function normalizeSchedule(raw) {
   return result;
 }
 
-// Weekly cell: "ספרדית (אינה, ט'3) / פיזיולוגיה של המאמץ (בתיה)"
+function normalizeExams(raw) {
+  if (!raw) return null;
+  if (Array.isArray(raw)) return { events: raw };
+  const events = raw.events || raw.exams;
+  if (!Array.isArray(events)) return null;
+  return { events };
+}
+
+function daysUntil(iso, today) {
+  const a = parseISODate(iso), b = parseISODate(today);
+  if (!a || !b) return 0;
+  return Math.round(Date.UTC(a.y, a.mo - 1, a.d) - Date.UTC(b.y, b.mo - 1, b.d)) / 86400000;
+}
+
+function daysUntilLabel(iso, today) {
+  const delta = daysUntil(iso, today);
+  if (delta === 0) return "היום";
+  if (delta === 1) return "מחר";
+  if (delta === -1) return "אתמול";
+  if (delta > 1) return `בעוד ${delta} ימים`;
+  return `לפני ${Math.abs(delta)} ימים`;
+}
+
+function examSubject(item) {
+  const type = String((item && item.type) || "").toUpperCase();
+  const fallback = (item && item.typeLabel) || TYPE_LABELS[type] || type || "מבחן";
+  const title = String((item && (item.title || item.subject)) || fallback).trim();
+  const parts = title.split(/\s+[—–-]\s+/);
+  return heQuotes((parts[0] || title).trim());
+}
+
+function examKindWord(item) {
+  const type = String((item && item.type) || "").toUpperCase();
+  if (type === "QUIZ") return "בוחן";
+  return "מבחן";
+}
+
+function listExamEvents(exams) {
+  const raw = !exams ? [] : (Array.isArray(exams) ? exams : (exams.events || exams.exams || []));
+  return raw
+    .map((item) => ({ date: (parseISODate(item.eventDate || item.date) || {}).iso, item }))
+    .filter((x) => x.date && EXAM_TYPES[String((x.item.type || "").toUpperCase())])
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function examOnDay(exams, iso) {
+  if (!iso) return null;
+  const hit = listExamEvents(exams).find((x) => x.date === iso);
+  return hit ? { date: hit.date, item: hit.item, subject: examSubject(hit.item), kind: examKindWord(hit.item) } : null;
+}
+
+function upcomingExam(exams, todayIso) {
+  const hit = listExamEvents(exams).find((x) => x.date >= todayIso);
+  if (!hit) return null;
+  const delta = daysUntil(hit.date, todayIso);
+  return {
+    date: hit.date,
+    item: hit.item,
+    subject: examSubject(hit.item),
+    kind: examKindWord(hit.item),
+    delta,
+    countdown: daysUntilLabel(hit.date, todayIso),
+    urgent: delta >= 0 && delta < 3,
+  };
+}
+
 function parseWeekCell(cell) {
   return String(cell || "").split(/\s+\/\s+/).map((part) => part.trim()).filter(Boolean).map((part) => {
     const m = part.match(/^(.*?)\s*\((.*)\)\s*$/);
@@ -268,21 +324,11 @@ function parseDailyGroups(lesson) {
 }
 
 function subjectLine(lesson) {
-  const groups = parseDailyGroups(lesson);
   const names = [];
-  groups.forEach((g) => {
+  parseDailyGroups(lesson).forEach((g) => {
     if (g.subject && names.indexOf(g.subject) === -1) names.push(g.subject);
   });
   return names.join(" / ") || "שיעור";
-}
-
-function teacherLine(lesson) {
-  const names = [];
-  parseDailyGroups(lesson).forEach((g) => {
-    const t = firstName(g.teacher);
-    if (t && names.indexOf(t) === -1) names.push(t);
-  });
-  return names.join(" / ");
 }
 
 function roomLine(lesson) {
@@ -292,19 +338,6 @@ function roomLine(lesson) {
     if (r && rooms.indexOf(r) === -1) rooms.push(r);
   });
   return rooms.join(" / ");
-}
-
-function metaLine(lesson, opts) {
-  const parts = [];
-  const time = formatLessonTime(lesson);
-  if (time) parts.push(time);
-  const room = roomLine(lesson);
-  if (room) parts.push(room);
-  if (opts && opts.teacher) {
-    const t = teacherLine(lesson);
-    if (t) parts.push(t);
-  }
-  return parts.join(" · ");
 }
 
 function dayFromBase(base, iso) {
@@ -370,15 +403,6 @@ function nextSchoolDate(iso) {
   return addDays(iso, 1);
 }
 
-function isLessonDone(lesson, dayIso, now) {
-  const clock = nowIsrael(now);
-  if (!dayIso || dayIso !== clock.date) return false;
-  if (lessonFlag(lesson) === "בוטל") return false;
-  const end = parseTimeMinutes(lesson && lesson.end);
-  if (end == null) return false;
-  return clock.minutes >= end;
-}
-
 function isDayOver(day, dayIso, now) {
   const clock = nowIsrael(now);
   if (!day || !dayIso || dayIso !== clock.date) return false;
@@ -413,48 +437,42 @@ function annotateLessons(day, now) {
       startMins: start,
       endMins: end,
       subjectText: subjectLine(filled),
-      teacherText: teacherLine(filled),
       roomText: roomLine(filled),
+      startText: timeText(filled.start),
+      endText: timeText(filled.end),
       timeText: formatLessonTime(filled),
-      metaText: "",
     });
   });
-  let next = null;
   if (isToday) {
-    next = lessons.find((l) => !l.cancelled && !l.done && !l.current && l.startMins != null && clock.minutes < l.startMins) || null;
+    const next = lessons.find((l) => !l.cancelled && !l.done && !l.current && l.startMins != null && clock.minutes < l.startMins) || null;
     if (next) next.isNext = true;
   } else if (lessons.length) {
-    const first = lessons.find((l) => !l.cancelled) || null;
-    if (first) first.isNext = true;
+    // Upcoming day: no 'הבא' mark and no bold-next (the tag has no meaning there).
   }
-  lessons.forEach((l) => {
-    l.metaText = metaLine(l, { teacher: false });
-  });
   return lessons;
 }
 
 function firstActive(lessons) {
-  return (lessons || []).find((l) => !l.cancelled) || null;
+  return (lessons || []).find((l) => !l.cancelled) || (lessons && lessons[0]) || null;
 }
 
-function remainingLessons(lessons, limit) {
-  const list = (lessons || []).filter((l) => !l.done);
-  return typeof limit === "number" ? list.slice(0, limit) : list;
+function headerTitle(todayIso, targetIso) {
+  const name = weekdayName(targetIso);
+  if (targetIso === todayIso) return `היום · ${name}`;
+  if (targetIso === addDays(todayIso, 1)) return `מחר · ${name}`;
+  return `יום ${name}`;
 }
 
-function relativeDayLabel(targetIso, todayIso) {
-  if (targetIso === todayIso) return "היום";
-  if (targetIso === addDays(todayIso, 1)) return "מחר";
-  return `יום ${weekdayName(targetIso)}`;
-}
-
-function startHint(targetIso, todayIso, first) {
-  const start = first && timeText(first.start);
-  if (!start) {
-    return targetIso === addDays(todayIso, 1) ? "אין לימודים מחר" : `אין לימודים ביום ${weekdayName(targetIso)}`;
-  }
-  if (targetIso === addDays(todayIso, 1)) return `מחר מתחילים ב-${start}`;
-  return `ביום ${weekdayName(targetIso)} מתחילים ב-${start}`;
+function dayBounds(lessons) {
+  const list = lessons || [];
+  const first = list[0];
+  const last = list.length ? list[list.length - 1] : null;
+  const lastActive = [...list].reverse().find((l) => !l.cancelled) || last;
+  return {
+    firstStart: (first && first.startText) || "",
+    lastEnd: (lastActive && lastActive.endText) || (last && last.endText) || "",
+    count: list.length,
+  };
 }
 
 function nextBoundaryDate(lessons, todayIso, now) {
@@ -469,21 +487,33 @@ function nextBoundaryDate(lessons, todayIso, now) {
     if (!l.done && !l.current && l.startMins != null && l.startMins > clock.minutes) {
       candidates.push(l.startMins);
     }
-    if (l.current && l.endMins != null) {
-      // already added end
-    }
   });
-  // Also refresh at the end of a just-ended lesson's successor already covered.
   if (!candidates.length) return plus30;
   const nextMins = Math.min.apply(null, candidates);
   const at = dateAtMinutes(todayIso, nextMins, d);
   if (!(at instanceof Date) || isNaN(at.getTime())) return plus30;
-  // If the boundary is in the past or too soon (< 30s), fall back.
   if (at.getTime() <= d.getTime() + 30 * 1000) return plus30;
   return at;
 }
 
-function buildModel(now, schedule, base) {
+function lessonRowData(l, showingToday) {
+  return {
+    num: l.num,
+    subject: l.subjectText,
+    start: l.startText,
+    end: l.endText,
+    time: l.timeText,
+    room: l.roomText,
+    flag: l.flag || "",
+    cancelled: !!l.cancelled,
+    done: !!l.done,
+    current: !!l.current,
+    next: !!l.isNext,
+    emphasize: !!(showingToday && l.isNext),
+  };
+}
+
+function buildModel(now, schedule, base, exams) {
   const clock = nowIsrael(now);
   const todayIso = clock.date;
   const todayDay = dayForIso(todayIso, schedule, base);
@@ -504,43 +534,61 @@ function buildModel(now, schedule, base) {
   const current = lessons.find((l) => l.current) || null;
   const next = lessons.find((l) => l.isNext) || null;
   const focus = current || next || firstActive(lessons);
-  const remaining = remainingLessons(lessons, 5);
-  const afterSchool = !showingToday;
-
-  let label = "";
-  if (showingToday && current) label = "עכשיו";
-  else if (showingToday && next) label = "הבא";
-
-  const header = showingToday
-    ? `היום · ${weekdayName(todayIso)}`
-    : (targetIso === addDays(todayIso, 1)
-      ? `מחר · ${weekdayName(targetIso)}`
-      : `יום ${weekdayName(targetIso)}`);
-
-  const hint = afterSchool ? startHint(targetIso, todayIso, firstActive(lessons)) : "";
+  const bounds = dayBounds(lessons);
+  const onDayExam = examOnDay(exams, targetIso);
+  const nextExam = upcomingExam(exams, todayIso);
 
   let refreshAt;
-  if (showingToday) {
-    refreshAt = nextBoundaryDate(lessons, todayIso, now);
-  } else {
+  if (showingToday) refreshAt = nextBoundaryDate(lessons, todayIso, now);
+  else {
     const d = now instanceof Date ? now : new Date();
     refreshAt = new Date(d.getTime() + 30 * 60 * 1000);
   }
+
+  const header = headerTitle(todayIso, targetIso);
+  const range = bounds.firstStart && bounds.lastEnd ? `${bounds.firstStart}–${bounds.lastEnd}` : (bounds.firstStart || "");
+  const countLine = bounds.count ? `${bounds.count} שיעורים · עד ${bounds.lastEnd}` : "";
+  const startLine = bounds.firstStart ? `מתחילים ב־${bounds.firstStart} · ${bounds.count} שיעורים` : "";
+
+  // Small anchor: first-lesson start, or current/next start when today is in session.
+  let anchorStart = bounds.firstStart;
+  let anchorSubject = focus ? focus.subjectText : "";
+  let anchorFlag = focus ? (focus.flag || "") : "";
+  let anchorCancelled = !!(focus && focus.cancelled);
+  if (showingToday && focus) {
+    anchorStart = focus.startText || anchorStart;
+    anchorSubject = focus.subjectText;
+    anchorFlag = focus.flag || "";
+    anchorCancelled = !!focus.cancelled;
+  }
+
+  const smallExam = onDayExam ? `${onDayExam.kind} ב${onDayExam.subject}` : "";
 
   return {
     todayIso,
     targetIso,
     showingToday,
-    afterSchool,
+    afterSchool: !showingToday,
     weekday: weekdayName(targetIso),
     header,
-    label,
-    startHint: hint,
+    range,
+    count: bounds.count,
+    countLine,
+    startLine,
+    firstStart: bounds.firstStart,
+    lastEnd: bounds.lastEnd,
+    anchorStart,
+    anchorSubject,
+    anchorFlag,
+    anchorCancelled,
+    smallExam,
+    onDayExam,
+    nextExam,
     focus,
     current,
     next,
     lessons,
-    remaining,
+    rows: lessons.map((l) => lessonRowData(l, showingToday)),
     source: (day && day.source) || (lessons.length ? "live" : "none"),
     className: (day && day.class) || CLASS_NAME,
     empty: !lessons.length,
@@ -550,65 +598,50 @@ function buildModel(now, schedule, base) {
 }
 
 function smallView(model) {
-  if (model.empty) {
-    return {
-      size: "small",
-      header: model.header,
-      label: "",
-      title: "אין שיעורים",
-      subtitle: model.afterSchool ? model.startHint : "",
-      detail: "",
-    };
-  }
-  if (model.afterSchool) {
-    const f = model.focus;
-    return {
-      size: "small",
-      header: model.header,
-      label: "",
-      title: model.startHint,
-      subtitle: f ? f.subjectText : "",
-      detail: f ? [f.timeText, f.roomText].filter(Boolean).join(" · ") : "",
-    };
-  }
-  const f = model.focus;
   return {
     size: "small",
     header: model.header,
-    label: model.label,
-    title: f ? f.subjectText : "אין שיעורים",
-    subtitle: f ? f.timeText : "",
-    detail: f ? [f.roomText, f.teacherText].filter(Boolean).join(" · ") : "",
+    time: model.anchorStart || "",
+    subject: model.anchorSubject || (model.empty ? "אין שיעורים" : ""),
+    flag: model.anchorFlag || "",
+    cancelled: !!model.anchorCancelled,
+    footer: model.smallExam || model.countLine || "",
+    footerIsExam: !!model.smallExam,
   };
 }
 
-function listView(model, size, limit) {
-  const rows = (size === "large" ? model.lessons : model.remaining).slice(0, limit);
+function mediumView(model) {
+  const all = model.rows || [];
+  const overflow = all.length > 4 ? all.length - 4 : 0;
+  const rows = all.slice(0, 4);
   return {
-    size,
+    size: "medium",
     header: model.header,
-    label: model.afterSchool ? model.startHint : (model.label || ""),
-    sourceNote: model.source === "base" ? "מערכת קבועה" : "",
-    rows: rows.map((l) => ({
-      num: l.num,
-      subject: l.subjectText,
-      meta: [l.timeText, l.roomText].filter(Boolean).join(" · "),
-      teacher: l.teacherText,
-      flag: l.flag,
-      current: !!l.current,
-      next: !!l.isNext,
-      done: !!l.done,
-      cancelled: !!l.cancelled,
-    })),
-    empty: !rows.length,
+    range: model.range,
+    rows,
+    overflow,
+    overflowLabel: overflow ? `⁦+${overflow}⁩ נוספים` : "",
+    empty: !all.length,
+  };
+}
+
+function largeView(model) {
+  const all = model.rows || [];
+  const compact = all.length > 7;
+  return {
+    size: "large",
+    header: model.header,
+    startLine: model.startLine,
+    rows: all.slice(0, 8),
+    compact,
+    showRoom: (row) => !!(row.room && row.subject.length <= 24),
+    exam: model.nextExam || null,
+    empty: !all.length,
   };
 }
 
 function describeModel(model) {
-  const small = smallView(model);
-  const medium = listView(model, "medium", 5);
-  const large = listView(model, "large", 12);
-  return { small, medium, large, model };
+  return { small: smallView(model), medium: mediumView(model), large: largeView(model), model };
 }
 
 // ---------------------------------------------------------------------------
@@ -624,11 +657,17 @@ function theme() {
   return {
     bg: dynColor(COLOR.bgLight, COLOR.bgDark),
     text: dynColor(COLOR.textLight, COLOR.textDark),
-    muted: dynColor(COLOR.mutedLight, COLOR.mutedDark),
-    cancelled: dynColor(COLOR.cancelledLight, COLOR.cancelledDark),
+    secondary: dynColor(COLOR.secondaryLight, COLOR.secondaryDark),
     line: dynColor(COLOR.lineLight, COLOR.lineDark),
     red: typeof Color !== "undefined" ? new Color(COLOR.red) : COLOR.red,
   };
+}
+
+function fontRegular(size) { return Font.systemFont(size); }
+function fontBold(size) { return Font.boldSystemFont(size); }
+function fontSemibold(size) {
+  if (typeof Font.semiboldSystemFont === "function") return Font.semiboldSystemFont(size);
+  return Font.boldSystemFont(size);
 }
 
 function cachePath() {
@@ -647,17 +686,16 @@ function readCache() {
   }
 }
 
-function writeCache(schedule, base) {
+function writeCache(schedule, base, exams) {
   try {
     const fm = FileManager.local();
     fm.writeString(cachePath(), JSON.stringify({
       savedAt: new Date().toISOString(),
       schedule,
       base,
+      exams,
     }));
-  } catch (e) {
-    // ignore cache write errors
-  }
+  } catch (e) {}
 }
 
 async function fetchJson(url) {
@@ -668,154 +706,231 @@ async function fetchJson(url) {
 }
 
 async function loadData() {
-  let schedule = null;
-  let base = null;
-  let fromCache = false;
-  try {
-    schedule = await fetchJson(SCHEDULE_URL);
-  } catch (e) {
-    schedule = null;
-  }
-  try {
-    base = await fetchJson(BASE_URL);
-  } catch (e) {
-    base = null;
-  }
-  if (schedule || base) {
+  let schedule = null, base = null, exams = null;
+  try { schedule = await fetchJson(SCHEDULE_URL); } catch (e) { schedule = null; }
+  try { base = await fetchJson(BASE_URL); } catch (e) { base = null; }
+  try { exams = await fetchJson(EXAMS_URL); } catch (e) { exams = null; }
+  if (schedule || base || exams) {
     const cached = readCache() || {};
-    writeCache(schedule || cached.schedule || null, base || cached.base || null);
+    writeCache(schedule || cached.schedule || null, base || cached.base || null, exams || cached.exams || null);
     return {
       schedule: schedule || cached.schedule || null,
       base: base || cached.base || null,
+      exams: exams || cached.exams || null,
       fromCache: !schedule || !base,
     };
   }
   const cached = readCache();
-  if (cached && (cached.schedule || cached.base)) {
-    return { schedule: cached.schedule || null, base: cached.base || null, fromCache: true };
+  if (cached && (cached.schedule || cached.base || cached.exams)) {
+    return { schedule: cached.schedule || null, base: cached.base || null, exams: cached.exams || null, fromCache: true };
   }
-  return { schedule: null, base: null, fromCache: false };
+  return { schedule: null, base: null, exams: null, fromCache: false };
 }
 
-function addAlignedText(stack, str, opts) {
+function addRightText(stack, str, opts) {
   const t = stack.addText(String(str || ""));
   t.rightAlignText();
   if (opts.font) t.font = opts.font;
   if (opts.color) t.textColor = opts.color;
-  if (opts.lineLimit) t.lineLimit = opts.lineLimit;
-  if (typeof opts.opacity === "number") t.textOpacity = opts.opacity;
+  t.lineLimit = opts.lineLimit || 1;
+  if (typeof opts.scale === "number") t.minimumScaleFactor = opts.scale;
   return t;
 }
 
-function addHeaderRow(widget, model, t, fonts, withDot) {
-  const row = widget.addStack();
-  row.layoutHorizontally();
-  row.centerAlignContent();
-  row.addSpacer();
-  const label = model.afterSchool ? "" : model.label;
-  const head = label || model.header;
-  const showDot = withDot && (model.showingToday || !!label);
-  if (showDot) {
-    const dot = row.addText("●");
-    dot.font = fonts.dot;
-    dot.textColor = t.red;
-    row.addSpacer(4);
-  }
-  addAlignedText(row, head, { font: fonts.label, color: label ? t.text : t.muted, lineLimit: 1 });
+function addDivider(widget, t, width) {
+  const line = widget.addStack();
+  line.layoutHorizontally();
+  line.backgroundColor = t.line;
+  line.size = new Size(width, 1);
+  return line;
 }
 
-function buildSmallWidget(widget, model, t, fonts) {
+function addLessonRow(parent, row, t, fonts, showRoom) {
+  const stack = parent.addStack();
+  stack.layoutHorizontally();
+  stack.centerAlignContent();
+
+  const left = stack.addStack();
+  left.layoutHorizontally();
+  left.centerAlignContent();
+  if (showRoom && row.room) {
+    const room = left.addText(row.room);
+    room.font = fonts.room;
+    room.textColor = t.secondary;
+    room.lineLimit = 1;
+    room.minimumScaleFactor = 0.8;
+    left.addSpacer(5);
+  }
+  if (row.start) {
+    const time = left.addText(row.start);
+    time.font = fonts.time;
+    time.textColor = t.secondary;
+    time.lineLimit = 1;
+  }
+
+  stack.addSpacer();
+
+  if (row.flag) {
+    const tag = stack.addText(row.flag);
+    tag.font = fonts.flag;
+    tag.textColor = t.red;
+    tag.lineLimit = 1;
+    stack.addSpacer(5);
+  }
+  const sub = stack.addText(row.subject);
+  sub.font = row.emphasize ? fonts.subjectBold : fonts.subject;
+  sub.textColor = (row.cancelled || row.done) ? t.secondary : t.text;
+  sub.lineLimit = 1;
+  sub.minimumScaleFactor = 0.8;
+  sub.rightAlignText();
+  return stack;
+}
+
+function contentWidth(family) {
+  if (family === "small") return 170 - 32;
+  return 364 - 32;
+}
+
+function buildSmallWidget(widget, model, t) {
   const v = smallView(model);
-  widget.setPadding(12, 14, 12, 14);
-  addHeaderRow(widget, model, t, fonts, true);
+  widget.setPadding(16, 16, 16, 16);
+  addRightText(widget, v.header, { font: fontSemibold(13), color: t.secondary });
   widget.addSpacer(6);
-  addAlignedText(widget, v.title, { font: fonts.title, color: t.text, lineLimit: 3 });
-  if (v.subtitle) {
-    widget.addSpacer(3);
-    addAlignedText(widget, v.subtitle, { font: fonts.sub, color: t.text, lineLimit: 2 });
-  }
-  if (v.detail) {
-    widget.addSpacer(2);
-    addAlignedText(widget, v.detail, { font: fonts.meta, color: t.muted, lineLimit: 1 });
-  }
-  widget.addSpacer();
-}
-
-function buildListWidget(widget, model, t, fonts, size) {
-  const limit = size === "large" ? 12 : 5;
-  const v = listView(model, size, limit);
-  const pad = size === "large" ? 14 : 12;
-  widget.setPadding(pad, 16, 12, 16);
-  addHeaderRow(widget, model, t, fonts, true);
-  if (model.afterSchool && model.startHint) {
-    widget.addSpacer(2);
-    addAlignedText(widget, model.startHint, { font: fonts.meta, color: t.muted, lineLimit: 1 });
-  }
-  if (v.sourceNote && model.afterSchool) {
-    addAlignedText(widget, v.sourceNote, { font: fonts.tiny, color: t.muted, lineLimit: 1 });
-  }
-  widget.addSpacer(6);
-  if (v.empty) {
-    addAlignedText(widget, "אין שיעורים", { font: fonts.sub, color: t.muted, lineLimit: 1 });
-    widget.addSpacer();
-    return;
-  }
-  v.rows.forEach((r, i) => {
-    if (i > 0) widget.addSpacer(size === "large" ? 5 : 4);
+  addRightText(widget, v.time || "—", { font: fontBold(34), color: t.text, scale: 0.7 });
+  widget.addSpacer(2);
+  if (v.flag) {
     const row = widget.addStack();
     row.layoutHorizontally();
     row.centerAlignContent();
-
-    // LTR stack, RTL-friendly visual: time on the left, subject + number on the right.
-    if (r.meta) {
-      const meta = row.addText(r.meta);
-      meta.font = fonts.tiny;
-      meta.textColor = t.muted;
-      meta.lineLimit = 1;
-    }
     row.addSpacer();
-
-    if (r.flag) {
-      const tag = row.addText(r.flag);
-      tag.font = fonts.tiny;
-      tag.textColor = r.cancelled ? t.cancelled : t.red;
-      tag.lineLimit = 1;
-      row.addSpacer(4);
-    }
-    if (r.current || r.next) {
-      const mark = row.addText(r.current ? "עכשיו" : "הבא");
-      mark.font = fonts.tiny;
-      mark.textColor = t.red;
-      mark.lineLimit = 1;
-      row.addSpacer(4);
-    }
-    const sub = row.addText(r.subject);
-    sub.font = r.current ? fonts.rowBold : fonts.row;
-    sub.textColor = r.cancelled || r.done ? t.cancelled : t.text;
+    const tag = row.addText(v.flag);
+    tag.font = fontSemibold(13);
+    tag.textColor = t.red;
+    tag.lineLimit = 1;
+    row.addSpacer(5);
+    const sub = row.addText(v.subject);
+    sub.font = fontSemibold(17);
+    sub.textColor = v.cancelled ? t.secondary : t.text;
     sub.lineLimit = 1;
-    if (r.cancelled || r.done) sub.textOpacity = 0.7;
-    row.addSpacer(6);
-    const num = row.addText(String(r.num));
-    num.font = fonts.num;
-    num.textColor = t.muted;
-    num.lineLimit = 1;
-  });
+    sub.minimumScaleFactor = 0.8;
+    sub.rightAlignText();
+  } else {
+    addRightText(widget, v.subject, {
+      font: fontSemibold(17),
+      color: v.cancelled ? t.secondary : t.text,
+      scale: 0.8,
+    });
+  }
   widget.addSpacer();
+  if (v.footer) {
+    addRightText(widget, v.footer, {
+      font: v.footerIsExam ? fontSemibold(13) : fontRegular(13),
+      color: v.footerIsExam ? t.red : t.secondary,
+      scale: 0.8,
+    });
+  }
 }
 
-function fontsFor(family) {
-  const small = family === "small";
-  return {
-    label: Font.boldSystemFont(small ? 11 : 12),
-    title: Font.boldSystemFont(small ? 16 : 18),
-    sub: Font.systemFont(small ? 13 : 14),
-    meta: Font.systemFont(12),
-    row: Font.systemFont(14),
-    rowBold: Font.boldSystemFont(14),
-    num: Font.systemFont(12),
-    tiny: Font.systemFont(10),
-    dot: Font.systemFont(8),
+function buildMediumWidget(widget, model, t) {
+  const v = mediumView(model);
+  widget.setPadding(16, 16, 16, 16);
+  const head = widget.addStack();
+  head.layoutHorizontally();
+  head.centerAlignContent();
+  if (v.range) {
+    const range = head.addText(v.range);
+    range.font = fontRegular(15);
+    range.textColor = t.secondary;
+    range.lineLimit = 1;
+  }
+  head.addSpacer();
+  const title = head.addText(v.header);
+  title.font = fontBold(17);
+  title.textColor = t.text;
+  title.lineLimit = 1;
+  title.rightAlignText();
+  widget.addSpacer(10);
+
+  if (v.empty) {
+    addRightText(widget, "אין שיעורים", { font: fontSemibold(16), color: t.secondary });
+    widget.addSpacer();
+    return;
+  }
+
+  const fonts = {
+    subject: fontSemibold(16),
+    subjectBold: fontBold(16),
+    time: fontRegular(14),
+    room: fontRegular(13),
+    flag: fontSemibold(13),
   };
+  v.rows.forEach((row, i) => {
+    if (i > 0) widget.addSpacer();
+    addLessonRow(widget, row, t, fonts, false);
+    if (i === v.rows.length - 1 && v.overflowLabel) {
+      const over = widget.addStack();
+      over.layoutHorizontally();
+      over.addSpacer();
+      const lab = over.addText(v.overflowLabel);
+      lab.font = fontRegular(13);
+      lab.textColor = t.secondary;
+      lab.lineLimit = 1;
+    }
+  });
+}
+
+function buildLargeWidget(widget, model, t) {
+  const v = largeView(model);
+  widget.setPadding(16, 16, 16, 16);
+  addRightText(widget, v.header, { font: fontBold(24), color: t.text, scale: 0.8 });
+  if (v.startLine) {
+    widget.addSpacer(4);
+    addRightText(widget, v.startLine, { font: fontRegular(15), color: t.secondary, scale: 0.8 });
+  }
+  widget.addSpacer(14);
+
+  if (v.empty) {
+    addRightText(widget, "אין שיעורים", { font: fontSemibold(19), color: t.secondary });
+    widget.addSpacer();
+    return;
+  }
+
+  const subSize = v.compact ? 17 : 19;
+  const timeSize = v.compact ? 15 : 16;
+  const fonts = {
+    subject: fontSemibold(subSize),
+    subjectBold: fontBold(subSize),
+    time: fontRegular(timeSize),
+    room: fontRegular(13),
+    flag: fontSemibold(13),
+  };
+  v.rows.forEach((row, i) => {
+    if (i > 0) widget.addSpacer();
+    const showRoom = !!(row.room && row.subject.length <= 24);
+    addLessonRow(widget, row, t, fonts, showRoom);
+  });
+
+  if (v.exam) {
+    widget.addSpacer();
+    addDivider(widget, t, contentWidth("large"));
+    widget.addSpacer(10);
+    addRightText(widget, "מבחן הבא", { font: fontSemibold(13), color: t.secondary });
+    widget.addSpacer(4);
+    const row = widget.addStack();
+    row.layoutHorizontally();
+    row.centerAlignContent();
+    const count = row.addText(v.exam.countdown);
+    count.font = fontRegular(14);
+    count.textColor = v.exam.urgent ? t.red : t.secondary;
+    count.lineLimit = 1;
+    row.addSpacer();
+    const sub = row.addText(v.exam.subject);
+    sub.font = fontSemibold(16);
+    sub.textColor = t.text;
+    sub.lineLimit = 1;
+    sub.minimumScaleFactor = 0.8;
+    sub.rightAlignText();
+  }
 }
 
 function createWidget(family, model) {
@@ -826,10 +941,10 @@ function createWidget(family, model) {
   if (model.refreshAt instanceof Date && !isNaN(model.refreshAt.getTime())) {
     widget.refreshAfterDate = model.refreshAt;
   }
-  const fonts = fontsFor(family);
-  if (family === "medium") buildListWidget(widget, model, t, fonts, "medium");
-  else if (family === "large" || family === "extraLarge") buildListWidget(widget, model, t, fonts, "large");
-  else buildSmallWidget(widget, model, t, fonts);
+  const size = family || "small";
+  if (size === "medium") buildMediumWidget(widget, model, t);
+  else if (size === "large" || size === "extraLarge") buildLargeWidget(widget, model, t);
+  else buildSmallWidget(widget, model, t);
   return widget;
 }
 
@@ -838,15 +953,15 @@ function errorWidget(message) {
   const t = theme();
   widget.backgroundColor = t.bg;
   widget.url = SITE_URL;
-  widget.setPadding(14, 16, 14, 16);
+  widget.setPadding(16, 16, 16, 16);
   const title = widget.addText("SchoolHub");
-  title.font = Font.boldSystemFont(14);
+  title.font = fontBold(15);
   title.textColor = t.text;
   title.rightAlignText();
   widget.addSpacer(6);
   const body = widget.addText(message || "אין נתונים כרגע");
-  body.font = Font.systemFont(13);
-  body.textColor = t.muted;
+  body.font = fontRegular(13);
+  body.textColor = t.secondary;
   body.rightAlignText();
   body.lineLimit = 4;
   widget.addSpacer();
@@ -858,7 +973,7 @@ async function main() {
   try {
     const data = await loadData();
     const now = new Date();
-    model = buildModel(now, data.schedule, data.base);
+    model = buildModel(now, data.schedule, data.base, data.exams);
     if (model.empty && !data.schedule && !data.base) {
       const w = errorWidget("אין נתונים. פתחו את האפליקציה או נסו שוב כשיש רשת.");
       if (typeof config !== "undefined" && config.runsInWidget) Script.setWidget(w);
@@ -909,16 +1024,20 @@ if (typeof module !== "undefined" && module.exports) {
     hebrewDayLetter,
     fillLessonTimes,
     parseWeekCell,
-    parseDailyGroups,
     lessonFlag,
     normalizeSchedule,
+    normalizeExams,
     dayFromBase,
     dayForIso,
     nextSchoolDate,
     isDayOver,
+    examOnDay,
+    upcomingExam,
+    daysUntilLabel,
     buildModel,
     smallView,
-    listView,
+    mediumView,
+    largeView,
     describeModel,
     main,
   };
