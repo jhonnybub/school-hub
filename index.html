@@ -440,6 +440,177 @@
     }
     .wrow.over .subject, .wrow.over .wmeta, .wrow.over .time, .wrow.over .wnum { color: var(--cancelled); }
     .week-note { font-size: 13px; color: var(--muted); line-height: 1.45; margin-top: 16px; }
+
+    /* ---- Homework (שיעורי בית) ---- */
+    .hw-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .hw-input, .hw-select, .hw-date {
+      width: 100%;
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--black);
+      background: var(--white);
+      border: 1px solid #DDDDDD;
+      border-radius: 8px;
+      padding: 10px 12px;
+      direction: rtl;
+      text-align: right;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .hw-input { min-height: 72px; resize: vertical; line-height: 1.4; }
+    .hw-input:focus, .hw-select:focus, .hw-date:focus { outline: none; border-color: var(--black); }
+    .hw-select {
+      background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position: 16px 50%, 11px 50%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+      padding-left: 30px;
+    }
+    .hw-fields { display: flex; gap: 10px; }
+    .hw-field { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .hw-label { font-size: 13px; font-weight: 600; color: var(--black); }
+    .hw-date { min-height: 44px; }
+    .hw-other[hidden] { display: none; }
+    .hw-add {
+      appearance: none;
+      align-self: flex-start;
+      min-height: 44px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--black);
+      color: var(--white);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .hw-add:disabled { opacity: 0.35; cursor: default; }
+    .hw-preview { font-size: 13px; color: var(--muted); line-height: 1.4; min-height: 18px; }
+    .hw-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .hw-row:last-child { border-bottom: 0; }
+    .hw-check {
+      -webkit-appearance: none;
+      appearance: none;
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      margin: 0;
+      margin-top: 1px;
+      border: 1.5px solid var(--black);
+      border-radius: 4px;
+      background: var(--white);
+      cursor: pointer;
+      display: grid;
+      place-content: center;
+    }
+    .hw-check::after {
+      content: "";
+      width: 12px;
+      height: 7px;
+      border-left: 2px solid var(--white);
+      border-bottom: 2px solid var(--white);
+      transform: translateY(-2px) rotate(-45deg);
+      opacity: 0;
+    }
+    .hw-check:checked { background: var(--black); }
+    .hw-check:checked::after { opacity: 1; }
+    .hw-check:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
+    .hw-body { flex: 1; min-width: 0; }
+    .hw-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 3px; }
+    .hw-due { font-size: 12px; color: var(--muted); line-height: 1.2; }
+    .hw-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--white);
+      background: var(--red);
+      border-radius: 4px;
+      padding: 1px 6px;
+      line-height: 1.3;
+    }
+    .hw-late { font-size: 12px; font-weight: 600; color: var(--red); line-height: 1.2; }
+    .hw-text {
+      appearance: none;
+      display: block;
+      width: 100%;
+      border: 0;
+      background: none;
+      padding: 0;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      line-height: 1.3;
+      color: var(--black);
+      text-align: right;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+    .hw-full {
+      margin-top: 6px;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .hw-full[hidden] { display: none; }
+    .hw-row.done .hw-text { color: var(--cancelled); text-decoration: line-through; text-decoration-thickness: 1px; font-weight: 400; }
+    .hw-row.done .type-tag, .hw-row.done .hw-due { opacity: 0.6; }
+    .hw-row.done .hw-check { border-color: var(--cancelled); }
+    .hw-row.done .hw-check:checked { background: var(--cancelled); }
+    .hw-del {
+      appearance: none;
+      flex-shrink: 0;
+      border: 0;
+      background: none;
+      padding: 4px 0 4px 2px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .hw-done-block { margin-top: 24px; }
+    .hw-done-block > summary {
+      list-style: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--black);
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hw-done-block > summary::-webkit-details-marker { display: none; }
+    .hw-done-block > summary::before { content: "‹"; display: inline-block; color: var(--muted); transition: transform 0.15s; }
+    .hw-done-block[open] > summary::before { transform: rotate(-90deg); }
+    .hw-clear { margin-top: 10px; }
+    .hw-banner {
+      appearance: none;
+      display: block;
+      width: 100%;
+      margin: 0 0 24px;
+      padding: 12px 14px;
+      border: 0;
+      border-right: 3px solid var(--red);
+      border-radius: 6px;
+      background: #F6F6F6;
+      font-family: inherit;
+      text-align: right;
+      cursor: pointer;
+      color: var(--black);
+    }
+    .hw-banner-title { display: block; font-size: 15px; font-weight: 700; line-height: 1.3; }
+    .hw-banner-list { display: block; margin-top: 4px; font-size: 14px; color: var(--black); line-height: 1.45; overflow-wrap: anywhere; }
+    .hw-note { font-size: 13px; color: var(--muted); line-height: 1.45; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -461,6 +632,7 @@
       <button type="button" data-target="schedule">מערכת</button>
       <button type="button" data-target="week">שבועית</button>
       <button type="button" data-target="exams">מבחנים</button>
+      <button type="button" data-target="homework">שיעורי בית</button>
       <button type="button" data-target="newsletter">עלון</button>
     </nav>
 
@@ -469,6 +641,7 @@
       <section class="screen" id="screen-schedule" data-screen="schedule"></section>
       <section class="screen" id="screen-exams" data-screen="exams"></section>
       <section class="screen" id="screen-week" data-screen="week"></section>
+      <section class="screen" id="screen-homework" data-screen="homework"></section>
       <section class="screen" id="screen-newsletter" data-screen="newsletter"></section>
       <section class="screen" id="screen-settings" data-screen="settings">
         <section class="section" aria-label="התראות">
@@ -653,7 +826,7 @@
   const HE_MONTHS = ["בינואר", "בפברואר", "במרץ", "באפריל", "במאי", "ביוני", "ביולי", "באוגוסט", "בספטמבר", "באוקטובר", "בנובמבר", "בדצמבר"];
   const TYPE_LABELS = { EXAM: "מבחן", QUIZ: "בוחן", EVENT: "אירוע", VACATION: "חופשה" };
   const EXAM_TYPES = new Set(["EXAM", "QUIZ"]);
-  const SCREENS = ["home", "schedule", "week", "exams", "newsletter", "settings"];
+  const SCREENS = ["home", "schedule", "week", "exams", "homework", "newsletter", "settings"];
   const APP_VERSION = "2026.11.24 · v3";
   const CLASS_NAME = "ט׳3";
 
@@ -1363,6 +1536,8 @@
     const banner = document.getElementById("example-banner");
     banner.hidden = true; // example-data note lives in הגדרות → מידע
     renderHome(document.getElementById("screen-home"), schedule, exams, today);
+    renderHomeBanner();
+    renderHomework(document.getElementById("screen-homework"), today);
     renderSchedule(document.getElementById("screen-schedule"), schedule, today);
     renderWeek(document.getElementById("screen-week"), today);
     renderExams(document.getElementById("screen-exams"), exams, today);
@@ -1395,9 +1570,382 @@
 
     setInterval(renderAll, 60 * 1000);
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") renderAll();
+      if (document.visibilityState === "visible") { renderAll(); hwEveningNotify(); }
     });
+    hwMirror();
+    hwEveningNotify();
   }
+
+
+  // ---- Homework checklist (שיעורי בית) ----
+  // Everything lives on the phone: localStorage (source of truth) plus a copy in
+  // IndexedDB so the service worker can read it when the box sends the evening
+  // "hw-check" push. Nothing is uploaded anywhere.
+  const HW_KEY = "schoolhub.homework.v1";
+  const HW_NOTIFIED_KEY = "schoolhub.homework.notified";
+  const HW_OTHER = "__other__";
+  const HW_MAX = 60;
+  const hwState = { items: [], openDone: false, dueTouched: false, built: false, expanded: new Set() };
+
+  function hwLoad() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(HW_KEY) || "[]");
+      return Array.isArray(raw) ? raw.filter((x) => x && typeof x === "object" && x.id && x.text) : [];
+    } catch { return []; }
+  }
+
+  function hwSave() {
+    try { localStorage.setItem(HW_KEY, JSON.stringify(hwState.items)); } catch (err) { console.error(err); }
+    hwMirror();
+  }
+
+  // Copy to IndexedDB for sw.js (service workers cannot read localStorage).
+  function hwMirror() {
+    if (!("indexedDB" in window)) return;
+    try {
+      const req = indexedDB.open("schoolhub", 1);
+      req.onupgradeneeded = () => req.result.createObjectStore("kv");
+      req.onsuccess = () => {
+        const db = req.result;
+        try {
+          const tx = db.transaction("kv", "readwrite");
+          tx.objectStore("kv").put(hwState.items, "homework");
+          tx.oncomplete = () => db.close();
+          tx.onerror = () => db.close();
+        } catch { db.close(); }
+      };
+      req.onerror = () => {};
+    } catch {}
+  }
+
+  // "Subject root" so "מתמטיקה 5 יח׳" matches "מתמטיקה" in the daily timetable
+  // and "אנגלית א" matches "אנגלית", but "חינוך" stays apart from "חינוך גופני".
+  function hwNorm(s) {
+    return heQuotes(s).replace(/["׳״']/g, "").replace(/\s+/g, " ").trim();
+  }
+  function hwRoot(s) {
+    return hwNorm(s).split(" ").filter((w) => w && !/^\d+$/.test(w) && w !== "יח" && w.length > 1).join(" ");
+  }
+  function hwSubjectMatch(a, b) {
+    const ra = hwRoot(a), rb = hwRoot(b);
+    return !!ra && !!rb && (hwNorm(a) === hwNorm(b) || ra === rb);
+  }
+
+  // Unique subjects from the weekly timetable (split groups separately).
+  function hwSubjects() {
+    const days = (weekState.base && weekState.base.days) || {};
+    const seen = new Map();
+    Object.values(days).forEach((day) => {
+      Object.keys(day || {}).sort((a, b) => Number(a) - Number(b)).forEach((n) => {
+        parseWeekCell(day[n]).forEach((g) => {
+          const s = g.subject.trim();
+          if (s && !seen.has(hwNorm(s))) seen.set(hwNorm(s), s);
+        });
+      });
+    });
+    return [...seen.values()].sort((a, b) => a.localeCompare(b, "he"));
+  }
+
+  function baseSubjectsFor(iso) {
+    const days = (weekState.base && weekState.base.days) || {};
+    const day = days[hebrewDayLetter(iso)] || {};
+    return Object.values(day).flatMap((cell) => parseWeekCell(cell).map((g) => g.subject));
+  }
+
+  // Subjects on a date: daily timetable (Daft) when it has that date, otherwise the weekly one.
+  function subjectsOn(iso) {
+    const daily = (state.schedule && state.schedule.days || []).find((d) => (parseISODate(d.date) || {}).iso === iso);
+    if (daily && (daily.lessons || []).length) {
+      return daily.lessons
+        .filter((l) => lessonFlag(l) !== "בוטל")
+        .flatMap((l) => String(l.subject || "").split("/").map((s) => s.trim()).filter(Boolean));
+    }
+    return baseSubjectsFor(iso);
+  }
+
+  function nextLessonDate(subject, today) {
+    for (let i = 1; i <= 14; i++) {
+      const iso = addDays(today, i);
+      if (baseSubjectsFor(iso).some((s) => hwSubjectMatch(s, subject))) return iso;
+    }
+    return "";
+  }
+
+  // Deterministic "condense": no AI, just tidy + trim + cap.
+  const HW_FILLERS = [
+    /^(?:שיעורי בית|ש["״׳']?ב)\s*[:\-–]\s*/,
+    /^(?:אני|אנחנו)\s+/,
+    /^(?:צריך|צריכה|צריכים|צריכות|חייב|חייבת|חייבים|יש)\s+(?=ל)/,
+    /^המורה\s+(?:אמרה|אמר|ביקשה|ביקש)\s+(?:ש|ל)?(?:צריך\s+)?/,
+    /^לעשות\s+את\s+/,
+    /^לעשות\s+/,
+    /^להכין\s+את\s+/,
+    /^לסיים\s+את\s+/,
+  ];
+  function hwCondense(text, subject) {
+    let t = String(text || "")
+      .split(/\r?\n+/).map((line) => line.replace(/^[\s•\-*·]+/, "").trim())
+      .filter(Boolean).join(" · ");
+    t = t.replace(/\s+/g, " ").trim();
+    t = t.replace(/\s*(?:בבקשה|בבקשהה+|תודה|אממ+|כאילו)\s*/g, " ").replace(/\s+/g, " ").trim();
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const re of HW_FILLERS) {
+        const next = t.replace(re, "");
+        if (next !== t && next.trim()) { t = next.trim(); changed = true; }
+      }
+    }
+    if (subject) {
+      const root = hwRoot(subject);
+      if (root) {
+        const esc = root.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const next = t.replace(new RegExp(`^(?:ב|ל)?${esc}\\s*[:\\-–,]?\\s+`), "");
+        if (next.trim()) t = next.trim();
+      }
+    }
+    t = t
+      .replace(/(^|\s)([בלמהו]?)עמודים(?=\s|$)/g, "$1$2עמ׳")
+      .replace(/(^|\s)([בלמהו]?)עמוד(?=\s|$)/g, "$1$2עמ׳")
+      .replace(/(^|\s)([בלמהו]?)תרגילים(?=\s|$)/g, "$1$2תר׳")
+      .replace(/(^|\s)([בלמהו]?)תרגיל(?=\s|$)/g, "$1$2תר׳")
+      .replace(/(^|\s)([בלמהו]?)שאלות(?=\s|$)/g, "$1$2שא׳")
+      .replace(/(^|\s)([בלמהו]?)מספר(?=\s|$)/g, "$1$2מס׳")
+      .replace(/\s+([,.!?:])/g, "$1")
+      .replace(/([!?.,])\1+/g, "$1")
+      .replace(/[\s.,·:;\-–]+$/, "")
+      .trim();
+    if (t.length > HW_MAX) {
+      let cut = t.slice(0, HW_MAX);
+      const sp = cut.lastIndexOf(" ");
+      if (sp > HW_MAX * 0.6) cut = cut.slice(0, sp);
+      t = cut.replace(/[\s.,·:;\-–]+$/, "") + "…";
+    }
+    return t || String(text || "").trim().slice(0, HW_MAX);
+  }
+
+  function hwIsForDate(item, iso, subjects) {
+    if (item.done) return false;
+    const inDay = subjects.some((s) => hwSubjectMatch(s, item.subject));
+    if (item.due) return item.due === iso || (item.due < iso && inDay);
+    return inDay;
+  }
+
+  function hwTomorrowItems(today) {
+    const tomorrow = addDays(today, 1);
+    const subjects = subjectsOn(tomorrow);
+    return hwState.items.filter((x) => hwIsForDate(x, tomorrow, subjects));
+  }
+
+  function hwDueLabel(item, today) {
+    if (!item.due) return "";
+    if (item.due === today) return "להיום";
+    if (item.due === addDays(today, 1)) return "";
+    if (item.due < today) return "";
+    const p = parseISODate(item.due);
+    return p ? `ליום ${hebrewDayLetter(item.due)}׳ ${p.d}.${p.mo}` : "";
+  }
+
+  function hwRowHtml(item, today, forTomorrow) {
+    const tag = item.subject ? `<span class="type-tag">${escapeHtml(item.subject)}</span>` : "";
+    const badge = forTomorrow ? `<span class="hw-badge">למחר</span>` : "";
+    const late = !item.done && item.due && item.due < today ? `<span class="hw-late">באיחור</span>` : "";
+    const dueTxt = !item.done ? hwDueLabel(item, today) : "";
+    const due = dueTxt ? `<span class="hw-due">${escapeHtml(dueTxt)}</span>` : "";
+    const open = hwState.expanded.has(item.id);
+    const hasMore = item.text.trim() !== item.short;
+    const del = item.done ? `<button type="button" class="hw-del" data-del="${escapeHtml(item.id)}" aria-label="מחק">מחק</button>` : "";
+    return `<div class="hw-row${item.done ? " done" : ""}" data-id="${escapeHtml(item.id)}">
+      <input type="checkbox" class="hw-check" data-check="${escapeHtml(item.id)}" ${item.done ? "checked" : ""} aria-label="${item.done ? "בטל סימון" : "סמן כבוצע"}: ${escapeHtml(item.short)}">
+      <div class="hw-body">
+        <div class="hw-meta">${tag}${badge}${late}${due}</div>
+        <button type="button" class="hw-text" data-toggle="${escapeHtml(item.id)}" aria-expanded="${open}">${escapeHtml(item.short)}</button>
+        <p class="hw-full" ${open && hasMore ? "" : "hidden"}>${escapeHtml(item.text.trim())}</p>
+      </div>
+      ${del}
+    </div>`;
+  }
+
+  function hwBuildForm(root, today) {
+    const opts = hwSubjects().map((s) => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
+    root.innerHTML = `
+      <form class="hw-form" id="hw-form" autocomplete="off">
+        <textarea class="hw-input" id="hw-text" rows="2" maxlength="600" placeholder="מה צריך להכין? למשל: לפתור תרגילים 1–5 בעמוד 42" aria-label="שיעורי הבית"></textarea>
+        <p class="hw-preview" id="hw-preview" aria-live="polite"></p>
+        <div class="hw-fields">
+          <label class="hw-field"><span class="hw-label">מקצוע</span>
+            <select class="hw-select" id="hw-subject"><option value="" disabled selected>בחר מקצוע</option>${opts}<option value="${HW_OTHER}">אחר</option></select>
+          </label>
+          <label class="hw-field"><span class="hw-label">להגשה</span>
+            <input type="date" class="hw-date" id="hw-due" min="${escapeHtml(today)}">
+          </label>
+        </div>
+        <input type="text" class="hw-input hw-other" id="hw-other" maxlength="40" placeholder="שם המקצוע" aria-label="שם המקצוע" hidden style="min-height:44px">
+        <button type="submit" class="hw-add" id="hw-add" disabled>הוסף</button>
+      </form>
+      <div id="hw-list"></div>`;
+    const text = root.querySelector("#hw-text");
+    const subj = root.querySelector("#hw-subject");
+    const other = root.querySelector("#hw-other");
+    const due = root.querySelector("#hw-due");
+    const add = root.querySelector("#hw-add");
+    const preview = root.querySelector("#hw-preview");
+    const currentSubject = () => (subj.value === HW_OTHER ? other.value.trim() : subj.value);
+    const refresh = () => {
+      const s = currentSubject();
+      add.disabled = !text.value.trim() || !s;
+      const short = text.value.trim() ? hwCondense(text.value, s) : "";
+      preview.textContent = short && short !== text.value.trim() ? `יישמר כך: ${short}` : "";
+    };
+    const setDefaultDue = () => {
+      if (hwState.dueTouched) return;
+      const s = currentSubject();
+      due.value = s ? nextLessonDate(s, todayIsrael()) : "";
+    };
+    text.addEventListener("input", refresh);
+    other.addEventListener("input", () => { refresh(); setDefaultDue(); });
+    subj.addEventListener("change", () => {
+      other.hidden = subj.value !== HW_OTHER;
+      if (!other.hidden) other.focus();
+      setDefaultDue();
+      refresh();
+    });
+    due.addEventListener("change", () => { hwState.dueTouched = true; });
+    root.querySelector("#hw-form").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const s = currentSubject();
+      const full = text.value.trim();
+      if (!full || !s) return;
+      hwState.items.unshift({
+        id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+        text: full,
+        short: hwCondense(full, s),
+        subject: s,
+        due: due.value || "",
+        done: false,
+        createdAt: new Date().toISOString(),
+      });
+      hwSave();
+      text.value = "";
+      other.value = "";
+      hwState.dueTouched = false;
+      setDefaultDue();
+      refresh();
+      text.blur();
+      renderHomeworkList();
+      renderHomeBanner();
+    });
+    root.addEventListener("click", hwHandleClick);
+    root.addEventListener("change", (ev) => {
+      const id = ev.target && ev.target.dataset && ev.target.dataset.check;
+      if (!id) return;
+      const item = hwState.items.find((x) => x.id === id);
+      if (!item) return;
+      item.done = ev.target.checked;
+      item.doneAt = item.done ? new Date().toISOString() : undefined;
+      hwSave();
+      renderHomeworkList();
+      renderHomeBanner();
+    });
+    hwState.built = true;
+  }
+
+  function hwHandleClick(ev) {
+    const t = ev.target.closest("[data-toggle],[data-del],[data-clear]");
+    if (!t) return;
+    if (t.dataset.toggle) {
+      const id = t.dataset.toggle;
+      if (hwState.expanded.has(id)) hwState.expanded.delete(id); else hwState.expanded.add(id);
+      renderHomeworkList();
+    } else if (t.dataset.del) {
+      hwState.items = hwState.items.filter((x) => x.id !== t.dataset.del);
+      hwSave();
+      renderHomeworkList();
+    } else if (t.dataset.clear) {
+      if (!confirm("למחוק את כל מה שבוצע?")) return;
+      hwState.items = hwState.items.filter((x) => !x.done);
+      hwSave();
+      renderHomeworkList();
+    }
+  }
+
+  function renderHomeworkList() {
+    const list = document.getElementById("hw-list");
+    if (!list) return;
+    const today = todayIsrael();
+    const tomorrowIds = new Set(hwTomorrowItems(today).map((x) => x.id));
+    const open = hwState.items.filter((x) => !x.done);
+    const done = hwState.items.filter((x) => x.done)
+      .sort((a, b) => String(b.doneAt || "").localeCompare(String(a.doneAt || "")));
+    // Order: tomorrow first, then by due date (no date last), newest first.
+    open.sort((a, b) => {
+      const ta = tomorrowIds.has(a.id) ? 0 : 1, tb = tomorrowIds.has(b.id) ? 0 : 1;
+      if (ta !== tb) return ta - tb;
+      const da = a.due || "9999", db = b.due || "9999";
+      if (da !== db) return da.localeCompare(db);
+      return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+    });
+    const details = document.querySelector(".hw-done-block");
+    if (details) hwState.openDone = details.open;
+    const parts = [];
+    parts.push(`<section class="section" aria-label="לביצוע"><h2 class="section-title">לביצוע${open.length ? ` · ${open.length}` : ""}</h2>`);
+    parts.push(open.length
+      ? open.map((x) => hwRowHtml(x, today, tomorrowIds.has(x.id))).join("")
+      : `<p class="info">${hwState.items.length ? "הכל בוצע. כל הכבוד!" : "אין שיעורי בית ברשימה. כתוב משימה למעלה ובחר מקצוע."}</p>`);
+    parts.push(`</section>`);
+    if (done.length) {
+      parts.push(`<details class="hw-done-block"${hwState.openDone ? " open" : ""}><summary>בוצע · ${done.length}</summary>
+        ${done.map((x) => hwRowHtml(x, today, false)).join("")}
+        <button type="button" class="more-link hw-clear" data-clear="1">מחק את כל מה שבוצע</button>
+      </details>`);
+    }
+    parts.push(`<p class="hw-note">הרשימה נשמרת רק במכשיר הזה. משימה שהמקצוע שלה מופיע במערכת של מחר מסומנת ״למחר״.</p>`);
+    list.innerHTML = parts.join("");
+  }
+
+  function renderHomework(root, today) {
+    if (!hwState.built) hwBuildForm(root, today);
+    renderHomeworkList();
+  }
+
+  function renderHomeBanner() {
+    const home = document.getElementById("screen-home");
+    if (!home) return;
+    const old = home.querySelector(".hw-banner");
+    if (old) old.remove();
+    const items = hwTomorrowItems(todayIsrael());
+    if (!items.length) return;
+    const lines = items.slice(0, 3).map((x) => escapeHtml(`${x.subject} — ${x.short}`));
+    if (items.length > 3) lines.push(escapeHtml(`ועוד ${items.length - 3}`));
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "hw-banner";
+    btn.innerHTML = `<span class="hw-banner-title">יש לך שיעורי בית למחר</span><span class="hw-banner-list">${lines.join("<br>")}</span>`;
+    btn.addEventListener("click", () => showScreen("homework"));
+    home.prepend(btn);
+  }
+
+  // Local reminder when the app is opened in the evening (no server involved).
+  async function hwEveningNotify() {
+    try {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      if (!("serviceWorker" in navigator)) return;
+      if (currentHourIsrael() < 17) return;
+      const today = todayIsrael();
+      if (localStorage.getItem(HW_NOTIFIED_KEY) === today) return;
+      const items = hwTomorrowItems(today);
+      if (!items.length) return;
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification("שיעורי בית למחר", {
+        body: items.slice(0, 4).map((x) => `☐ ${x.subject}: ${x.short}`).join("\n"),
+        icon: "icon-192.png", lang: "he", dir: "rtl", tag: "hw-tomorrow",
+        data: { url: new URL("./#homework", location.href).href },
+      });
+      localStorage.setItem(HW_NOTIFIED_KEY, today);
+    } catch (err) { console.error(err); }
+  }
+
+  hwState.items = hwLoad();
 
   // ---- Push notifications (iOS 16.4+ home-screen web push) ----
   const VAPID_PUBLIC_KEY = "BABkEtqk9nK9Eb0l-1mkobx2Zp1Oe5BZr_WjYi3v4r6jwxac0JCu0hKQz4F5NMAA-QY_bG8l3Lm7Hwy9ca3BzQo";
