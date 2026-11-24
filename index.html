@@ -438,7 +438,6 @@
       padding: 0 5px;
       line-height: 1.5;
     }
-    .wrow.over .subject, .wrow.over .wmeta, .wrow.over .time, .wrow.over .wnum { color: var(--cancelled); }
     .week-note { font-size: 13px; color: var(--muted); line-height: 1.45; margin-top: 16px; }
 
     /* ---- Homework (שיעורי בית) ---- */
@@ -827,7 +826,7 @@
   const TYPE_LABELS = { EXAM: "מבחן", QUIZ: "בוחן", EVENT: "אירוע", VACATION: "חופשה" };
   const EXAM_TYPES = new Set(["EXAM", "QUIZ"]);
   const SCREENS = ["home", "schedule", "week", "exams", "homework", "newsletter", "settings"];
-  const APP_VERSION = "2026.11.24 · v3";
+  const APP_VERSION = "2026.11.24 · v3.1";
   const CLASS_NAME = "ט׳3";
 
   // Built-in bell schedule. Daft's data often has start/end = null; we fill
@@ -1425,21 +1424,21 @@
     }
   }
 
-  function weekRow(num, cell, isToday) {
+  // Static: the regular timetable only. No live state (no ✓, no grey-out,
+  // no changes/cancellations); those belong to the daily "מערכת" screen.
+  function weekRow(num, cell) {
     const groups = parseWeekCell(cell);
     const bells = bellFor(num);
     const time = bells ? `${bells.start}–${bells.end}` : "";
-    const over = isToday && bells && nowIsrael().minutes >= parseTimeMinutes(bells.end);
     const body = groups.map((g) => {
       const meta = [g.teacher, formatRoom(g.room)].filter(Boolean).join(" · ");
       return `<div class="wgroup"><div class="row-top"><span class="subject">${escapeHtml(g.subject)}</span></div>${meta ? `<div class="wmeta">${escapeHtml(meta)}</div>` : ""}</div>`;
     }).join("");
     const split = groups.length > 1 ? `<span class="split-tag">${groups.length} קבוצות</span>` : "";
-    const check = over ? `<span class="done-mark" aria-label="השיעור הסתיים">✓</span>` : "";
-    return `<div class="wrow${over ? " over" : ""}">
+    return `<div class="wrow">
       <div class="wnum">${escapeHtml(num)}</div>
       <div class="wbody">${body}</div>
-      <div class="wside">${time ? `<div class="time">${escapeHtml(time)}</div>` : ""}${check}${split}</div>
+      <div class="wside">${time ? `<div class="time">${escapeHtml(time)}</div>` : ""}${split}</div>
     </div>`;
   }
 
@@ -1460,15 +1459,14 @@
       .sort((a, b) => Number(a[0]) - Number(b[0]));
     const isToday = sel === todayLetter;
     const rows = lessons.length
-      ? lessons.map(([n, c]) => weekRow(n, c, isToday)).join("")
+      ? lessons.map(([n, c]) => weekRow(n, c)).join("")
       : `<p class="empty">אין שיעורים ביום זה.</p>`;
     const todayTag = isToday ? `<span class="today-tag">היום</span>` : "";
     const last = lessons.length ? bellFor(lessons[lessons.length - 1][0]) : null;
     const range = lessons.length && bellFor(lessons[0][0]) && last ? ` · ${bellFor(lessons[0][0]).start}–${last.end}` : "";
-    const fri = !isSchoolDay ? `<p class="info" style="margin-bottom:12px">היום אין לימודים. מוצג יום ראשון.</p>` : "";
-    root.innerHTML = `${fri}<div class="week-days" role="tablist" aria-label="ימי השבוע">${chips}</div>
+    root.innerHTML = `<div class="week-days" role="tablist" aria-label="ימי השבוע">${chips}</div>
       <section class="section"><h2 class="section-title week-title">יום ${WEEK_DAY_NAMES[sel]}${todayTag}<span class="wmeta" style="margin:0;font-weight:400"><bdi dir="ltr">${escapeHtml(range.replace(" · ", ""))}</bdi></span></h2>${rows}</section>
-      <p class="week-note">המערכת הקבועה של ${escapeHtml(formatClass(base.class))}. שינויים ליום מסוים מופיעים במסך ״מערכת״. בשישי אין לימודים.</p>`;
+      <p class="week-note">בשישי אין לימודים.</p>`;
     root.querySelectorAll(".week-day").forEach((btn) => {
       btn.addEventListener("click", () => {
         weekState.picked = btn.dataset.day;
