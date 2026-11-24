@@ -610,6 +610,73 @@
     .hw-banner-title { display: block; font-size: 15px; font-weight: 700; line-height: 1.3; }
     .hw-banner-list { display: block; margin-top: 4px; font-size: 14px; color: var(--black); line-height: 1.45; overflow-wrap: anywhere; }
     .hw-note { font-size: 13px; color: var(--muted); line-height: 1.45; margin-top: 20px; }
+
+    /* ---- Widgets (ווידג׳טים) ---- */
+    .widget-link {
+      color: var(--black);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .widget-copy {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--black);
+      color: var(--white);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .widget-copy:disabled { opacity: 0.35; cursor: default; }
+    .widget-copy.done { background: var(--red); }
+    .widget-err { margin-top: 10px; font-size: 14px; color: var(--red); line-height: 1.45; }
+    .widget-err[hidden] { display: none; }
+    .widget-sizes { margin-top: 16px; font-size: 14px; color: var(--muted); line-height: 1.45; }
+    .widget-how { margin-top: 20px; }
+    .widget-how > summary {
+      list-style: none;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--black);
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .widget-how > summary::-webkit-details-marker { display: none; }
+    .widget-how > summary::before {
+      content: "‹";
+      display: inline-block;
+      color: var(--muted);
+      transition: transform 0.15s;
+    }
+    .widget-how[open] > summary::before { transform: rotate(-90deg); }
+    .widget-how ol { margin: 4px 0 0; padding: 0 20px 0 0; }
+    .widget-how li {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: var(--black);
+      line-height: 1.45;
+    }
+    .widget-how li:last-child { margin-bottom: 0; }
+    .widget-note { margin-top: 16px; font-size: 14px; color: var(--muted); line-height: 1.45; }
+    .widget-en {
+      display: block;
+      margin-top: 6px;
+      font-size: 14px;
+      color: var(--black);
+      line-height: 1.45;
+      text-align: left;
+      direction: ltr;
+    }
   </style>
 </head>
 <body>
@@ -633,6 +700,7 @@
       <button type="button" data-target="exams">מבחנים</button>
       <button type="button" data-target="homework">שיעורי בית</button>
       <button type="button" data-target="newsletter">עלון</button>
+      <button type="button" data-target="widgets">ווידג׳טים</button>
     </nav>
 
     <main>
@@ -642,6 +710,24 @@
       <section class="screen" id="screen-week" data-screen="week"></section>
       <section class="screen" id="screen-homework" data-screen="homework"></section>
       <section class="screen" id="screen-newsletter" data-screen="newsletter"></section>
+      <section class="screen" id="screen-widgets" data-screen="widgets">
+        <section class="section" aria-label="ווידג׳טים">
+          <p class="settings-text">אפשר לשים ווידג׳ט של המערכת על מסך הבית, דרך האפליקציה החינמית <a class="widget-link" href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener noreferrer">Scriptable</a><span dir="rtl">.</span></p>
+          <button type="button" class="widget-copy" id="widget-copy">העתק קוד</button>
+          <p class="widget-err" id="widget-copy-err" hidden></p>
+          <p class="widget-sizes">בקטן מופיע השיעור עכשיו או הבא, בבינוני השיעורים שנשארו היום, ובגדול כל היום.</p>
+          <details class="widget-how">
+            <summary>איך להתקין?</summary>
+            <ol>
+              <li>הורידו את <bdi dir="ltr">Scriptable</bdi> מ־App Store, אם היא עוד לא אצלכם.</li>
+              <li>פתחו את <bdi dir="ltr">Scriptable</bdi>, לחצו על <strong>+</strong>, הדביקו את הקוד, ושמרו בשם <bdi dir="ltr">SchoolHub.</bdi></li>
+              <li>לחיצה ארוכה על מסך הבית, לחצו על <strong>+</strong>, בחרו <bdi dir="ltr">Scriptable</bdi>, בחרו גודל והוסיפו.</li>
+              <li>לחיצה ארוכה על הווידג׳ט, ואז ב־Edit Widget בחרו:<span class="widget-en">Script: SchoolHub<br>When Interacting: Run Script</span></li>
+            </ol>
+            <p class="widget-note">לחיצה על הווידג׳ט פותחת את <bdi dir="ltr">SchoolHub.</bdi> הוא מתעדכן לבד, בדרך כלל כל 15 עד 30 דקות.</p>
+          </details>
+        </section>
+      </section>
       <section class="screen" id="screen-settings" data-screen="settings">
         <section class="section" aria-label="התראות">
           <h2 class="section-title">התראות</h2>
@@ -825,8 +911,8 @@
   const HE_MONTHS = ["בינואר", "בפברואר", "במרץ", "באפריל", "במאי", "ביוני", "ביולי", "באוגוסט", "בספטמבר", "באוקטובר", "בנובמבר", "בדצמבר"];
   const TYPE_LABELS = { EXAM: "מבחן", QUIZ: "בוחן", EVENT: "אירוע", VACATION: "חופשה" };
   const EXAM_TYPES = new Set(["EXAM", "QUIZ"]);
-  const SCREENS = ["home", "schedule", "week", "exams", "homework", "newsletter", "settings"];
-  const APP_VERSION = "2026.11.24 · v3.1";
+  const SCREENS = ["home", "schedule", "week", "exams", "homework", "newsletter", "widgets", "settings"];
+  const APP_VERSION = "2026.11.24 · v3.2";
   const CLASS_NAME = "ט׳3";
 
   // Built-in bell schedule. Daft's data often has start/end = null; we fill
@@ -1546,7 +1632,66 @@
     if (document.getElementById("greeting").textContent) updateHeader(screen);
   }
 
+  function fallbackCopyText(text) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "0";
+    ta.style.right = "0";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  async function copyWidgetScript() {
+    const btn = document.getElementById("widget-copy");
+    const err = document.getElementById("widget-copy-err");
+    if (!btn) return;
+    if (err) { err.hidden = true; err.textContent = ""; }
+    const previous = btn.textContent;
+    btn.disabled = true;
+    try {
+      const res = await fetch("./widget/SchoolHub.js?t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("fetch");
+      const text = await res.text();
+      if (!text || text.length < 100) throw new Error("empty");
+      let copied = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        } catch {
+          copied = fallbackCopyText(text);
+        }
+      } else {
+        copied = fallbackCopyText(text);
+      }
+      if (!copied) throw new Error("clipboard");
+      btn.textContent = "הועתק ✓";
+      btn.classList.add("done");
+      setTimeout(() => {
+        btn.textContent = "העתק קוד";
+        btn.classList.remove("done");
+        btn.disabled = false;
+      }, 2500);
+    } catch {
+      btn.disabled = false;
+      btn.textContent = previous;
+      if (err) {
+        err.hidden = false;
+        err.textContent = "לא הצלחתי להעתיק. נסו שוב, או פתחו את הקובץ והעתיקו ידנית.";
+      }
+    }
+  }
+
   function boot(raw) {
+
     const schedule = normalizeSchedule(raw.schedule);
     const exams = normalizeExams(raw.exams);
     const newsletter = normalizeNewsletter(raw.newsletter);
@@ -1562,6 +1707,8 @@
     document.getElementById("text-nav").querySelectorAll("button").forEach((btn) => {
       btn.addEventListener("click", () => showScreen(btn.dataset.target));
     });
+    const widgetCopy = document.getElementById("widget-copy");
+    if (widgetCopy) widgetCopy.addEventListener("click", copyWidgetScript);
     window.addEventListener("hashchange", () => showScreen(location.hash.replace("#", "")));
     const initial = location.hash.replace("#", "") || "home";
     showScreen(initial);
