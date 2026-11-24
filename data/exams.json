@@ -2,61 +2,73 @@
   {
     "eventDate": "2026-11-26",
     "type": "EVENT",
-    "title": "רב תרבותי- סיור בפלמחים"
+    "title": "רב תרבותי- סיור בפלמחים",
+    "typeLabel": "אירוע"
   },
   {
     "eventDate": "2026-12-01",
     "type": "EXAM",
-    "title": "ביולגיה"
+    "title": "ביולגיה",
+    "typeLabel": "מבחן"
   },
   {
     "eventDate": "2026-12-03",
     "type": "EXAM",
-    "title": "עברית"
+    "title": "עברית",
+    "typeLabel": "מבחן"
   },
   {
     "eventDate": "2026-12-13",
     "type": "EVENT",
-    "title": "רופא שיניים"
+    "title": "רופא שיניים",
+    "typeLabel": "אירוע"
   },
   {
     "eventDate": "2026-12-14",
     "type": "QUIZ",
-    "title": "מתמטיקה"
+    "title": "מתמטיקה",
+    "typeLabel": "בוחן"
   },
   {
     "eventDate": "2026-12-17",
     "type": "EXAM",
-    "title": "פיזיקה"
+    "title": "פיזיקה",
+    "typeLabel": "מבחן"
   },
   {
     "eventDate": "2026-12-21",
     "type": "EXAM",
-    "title": "אנגלית"
+    "title": "אנגלית",
+    "typeLabel": "מבחן"
   },
   {
     "eventDate": "2026-12-28",
     "type": "QUIZ",
-    "title": "מתמטיקה"
+    "title": "מתמטיקה",
+    "typeLabel": "בוחן"
   },
   {
     "eventDate": "2026-12-31",
     "type": "EVENT",
-    "title": "רב תרבותי- סיור לרמלה"
+    "title": "רב תרבותי- סיור לרמלה",
+    "typeLabel": "אירוע"
   },
   {
     "eventDate": "2027-01-05",
     "type": "EXAM",
-    "title": "ערבית"
+    "title": "ערבית",
+    "typeLabel": "מבחן"
   },
   {
     "eventDate": "2027-03-17",
     "type": "EVENT",
-    "title": "טיול מסלול רב תרבותי"
+    "title": "טיול מסלול רב תרבותי",
+    "typeLabel": "אירוע"
   },
   {
     "eventDate": "2027-03-18",
     "type": "EVENT",
-    "title": "טיול מסלול רב תרבותי"
+    "title": "טיול מסלול רב תרבותי",
+    "typeLabel": "אירוע"
   }
 ]

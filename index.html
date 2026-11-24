@@ -221,6 +221,18 @@
       font-weight: 600;
     }
 
+    .type-tag {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.2;
+      flex-shrink: 0;
+      padding: 1px 6px;
+      border: 1px solid #EEEEEE;
+      border-radius: 4px;
+      background: #F4F4F4;
+    }
+
     .empty, .info, .install-hint, .more-link, .intro, .newsletter-body {
       font-size: 15px;
       font-weight: 400;
@@ -302,7 +314,7 @@
   //   are filled from the built-in bell schedule (BELL_SCHEDULE) by lesson num
   //   (1-based period). A list of days, or {is_example, class, days:[...]},
   //   is also accepted.
-  // exams: [{eventDate, type: EXAM|QUIZ|EVENT|VACATION, title}]
+  // exams: [{eventDate, type: EXAM|QUIZ|EVENT|VACATION, title, typeLabel?}]
   //   or {is_example, events:[...]}.
   // newsletter: {title, date, intro, sections:[{heading, body}]}.
   // ---------------------------------------------------------------------------
@@ -361,65 +373,77 @@
     }
   ],
   "exams": [
-    {
+        {
       "eventDate": "2026-11-26",
       "type": "EVENT",
-      "title": "רב תרבותי- סיור בפלמחים"
+      "title": "רב תרבותי- סיור בפלמחים",
+      "typeLabel": "אירוע"
     },
-    {
+        {
       "eventDate": "2026-12-01",
       "type": "EXAM",
-      "title": "ביולגיה"
+      "title": "ביולגיה",
+      "typeLabel": "מבחן"
     },
-    {
+        {
       "eventDate": "2026-12-03",
       "type": "EXAM",
-      "title": "עברית"
+      "title": "עברית",
+      "typeLabel": "מבחן"
     },
-    {
+        {
       "eventDate": "2026-12-13",
       "type": "EVENT",
-      "title": "רופא שיניים"
+      "title": "רופא שיניים",
+      "typeLabel": "אירוע"
     },
-    {
+        {
       "eventDate": "2026-12-14",
       "type": "QUIZ",
-      "title": "מתמטיקה"
+      "title": "מתמטיקה",
+      "typeLabel": "בוחן"
     },
-    {
+        {
       "eventDate": "2026-12-17",
       "type": "EXAM",
-      "title": "פיזיקה"
+      "title": "פיזיקה",
+      "typeLabel": "מבחן"
     },
-    {
+        {
       "eventDate": "2026-12-21",
       "type": "EXAM",
-      "title": "אנגלית"
+      "title": "אנגלית",
+      "typeLabel": "מבחן"
     },
-    {
+        {
       "eventDate": "2026-12-28",
       "type": "QUIZ",
-      "title": "מתמטיקה"
+      "title": "מתמטיקה",
+      "typeLabel": "בוחן"
     },
-    {
+        {
       "eventDate": "2026-12-31",
       "type": "EVENT",
-      "title": "רב תרבותי- סיור לרמלה"
+      "title": "רב תרבותי- סיור לרמלה",
+      "typeLabel": "אירוע"
     },
-    {
+        {
       "eventDate": "2027-01-05",
       "type": "EXAM",
-      "title": "ערבית"
+      "title": "ערבית",
+      "typeLabel": "מבחן"
     },
-    {
+        {
       "eventDate": "2027-03-17",
       "type": "EVENT",
-      "title": "טיול מסלול רב תרבותי"
+      "title": "טיול מסלול רב תרבותי",
+      "typeLabel": "אירוע"
     },
-    {
+        {
       "eventDate": "2027-03-18",
       "type": "EVENT",
-      "title": "טיול מסלול רב תרבותי"
+      "title": "טיול מסלול רב תרבותי",
+      "typeLabel": "אירוע"
     }
   ],
   "newsletter": {
@@ -712,10 +736,17 @@
     return "";
   }
 
+  function eventTypeLabel(item) {
+    const raw = item && item.typeLabel;
+    if (raw != null && String(raw).trim()) return String(raw).trim();
+    const type = String((item && item.type) || "").toUpperCase();
+    return TYPE_LABELS[type] || "";
+  }
+
   function examSubject(item) {
     const type = (item.type || "").toUpperCase();
-    const typeLabel = TYPE_LABELS[type] || type || "אירוע";
-    const title = String(item.title || item.subject || typeLabel).trim();
+    const fallback = eventTypeLabel(item) || TYPE_LABELS[type] || type || "אירוע";
+    const title = String(item.title || item.subject || fallback).trim();
     const parts = title.split(/\s+[—–-]\s+/);
     return (parts[0] || title).trim();
   }
@@ -766,11 +797,9 @@
   function examRow(item, dateIso, today, opts = {}) {
     const type = (item.type || "").toUpperCase();
     const subject = escapeHtml(examSubject(item));
-    const typeLabel = TYPE_LABELS[type] || "";
-    let dateLine = dateIso ? formatExamDate(dateIso) : "";
-    if (opts.showType && typeLabel) {
-      dateLine = dateLine ? `${typeLabel} · ${dateLine}` : typeLabel;
-    }
+    const typeLabel = eventTypeLabel(item);
+    const tagHtml = typeLabel ? `<span class="type-tag">${escapeHtml(typeLabel)}</span>` : "";
+    const dateLine = dateIso ? formatExamDate(dateIso) : "";
     const [delta, label] = dateIso ? daysUntilLabel(dateIso, today) : [null, ""];
     const urgent = dateIso ? isUrgentCountdown(dateIso, today, type) : false;
     const countHtml = label
@@ -778,7 +807,7 @@
       : "";
     return `<div class="row">
       <div class="row-start">
-        <div class="row-top"><span class="subject">${subject}</span></div>
+        <div class="row-top"><span class="subject">${subject}</span>${tagHtml}</div>
         ${dateLine ? `<div class="room">${escapeHtml(dateLine)}</div>` : ""}
       </div>
       ${countHtml}
