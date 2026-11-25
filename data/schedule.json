@@ -1,56 +1,5 @@
 [
   {
-    "date": "2026-11-24",
-    "class": "ט׳3",
-    "lessons": [
-      {
-        "num": 1,
-        "start": null,
-        "end": null,
-        "subject": "היסטוריה",
-        "teacher": "לין",
-        "room": "ט׳3",
-        "status": null
-      },
-      {
-        "num": 2,
-        "start": null,
-        "end": null,
-        "subject": "חינוך גופני/ספרדית",
-        "teacher": "בתיה/אינה",
-        "room": null,
-        "status": null
-      },
-      {
-        "num": 3,
-        "start": null,
-        "end": null,
-        "subject": "ביולוגיה",
-        "teacher": "רונית",
-        "room": "ט׳3",
-        "status": null
-      },
-      {
-        "num": 4,
-        "start": null,
-        "end": null,
-        "subject": "מתמטיקה",
-        "teacher": "קרן/חגית",
-        "room": null,
-        "status": null
-      },
-      {
-        "num": 5,
-        "start": null,
-        "end": null,
-        "subject": "מתמטיקה",
-        "teacher": "קרן/חגית",
-        "room": null,
-        "status": null
-      }
-    ]
-  },
-  {
     "date": "2026-11-25",
     "class": "ט׳3",
     "lessons": [
@@ -105,6 +54,66 @@
         "end": null,
         "subject": "אנגלית א/אנגלית",
         "teacher": "רונית/אינה",
+        "room": null,
+        "status": null
+      }
+    ]
+  },
+  {
+    "date": "2026-11-26",
+    "class": "ט׳3",
+    "lessons": [
+      {
+        "num": 1,
+        "start": null,
+        "end": null,
+        "subject": "ערבית",
+        "teacher": "יובל",
+        "room": "ט׳3",
+        "status": null
+      },
+      {
+        "num": 2,
+        "start": null,
+        "end": null,
+        "subject": "עברית",
+        "teacher": "תמי",
+        "room": "ט׳3",
+        "status": null
+      },
+      {
+        "num": 3,
+        "start": null,
+        "end": null,
+        "subject": "חינוך גופני",
+        "teacher": "איתן/בתיה",
+        "room": null,
+        "status": null
+      },
+      {
+        "num": 4,
+        "start": null,
+        "end": null,
+        "subject": "היסטוריה",
+        "teacher": "לין",
+        "room": "ט׳3",
+        "status": null
+      },
+      {
+        "num": 5,
+        "start": null,
+        "end": null,
+        "subject": "חינוך",
+        "teacher": "בתיה",
+        "room": "ט׳3",
+        "status": null
+      },
+      {
+        "num": 6,
+        "start": null,
+        "end": null,
+        "subject": "מזרחנות-רב תרבות",
+        "teacher": "יובל",
         "room": null,
         "status": null
       }
