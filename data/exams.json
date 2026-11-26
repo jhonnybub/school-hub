@@ -54,6 +54,12 @@
     "typeLabel": "אירוע"
   },
   {
+    "eventDate": "2027-01-03",
+    "type": "QUIZ",
+    "title": "היסטוריה",
+    "typeLabel": "בוחן"
+  },
+  {
     "eventDate": "2027-01-05",
     "type": "EXAM",
     "title": "ערבית",
